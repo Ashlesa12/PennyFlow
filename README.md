@@ -62,7 +62,7 @@ PennyFlow/
 Clone the repository:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/PennyFlow.git
+git clone https://github.com/Ashlesa12/PennyFlow.git
 ```
 
 Go into the project:
