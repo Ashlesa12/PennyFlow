@@ -35,9 +35,12 @@ PennyFlow is a full-stack personal expense tracker that helps users manage their
 - Get Current Logged-in User (`/auth/me`)
 - Environment Variable Configuration (.env)
 - Interactive API Documentation (Swagger UI)
+- Expense CRUD APIs
+- Expense Filtering
+- Expense Sorting
 
 ### 🚧 In Progress
-- Expense CRUD APIs
+- Expense Summary API
 - Category Management
 - Dashboard
 - Frontend Development
