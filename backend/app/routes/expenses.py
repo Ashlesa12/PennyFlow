@@ -3,11 +3,18 @@ from datetime import date
 
 from fastapi import APIRouter, Depends, HTTPException, status, Response
 from sqlalchemy.orm import Session
-from sqlalchemy import desc
+from sqlalchemy import desc, func
+from app.schemas import (
+    ExpenseCreate,
+    ExpenseResponse,
+    ExpenseUpdate,
+    ExpenseSummary,
+    CategorySummary,
+    MonthlySummary
+)
 
 from app.database import get_db
-from app.models import Expense, User
-from app.schemas import ExpenseCreate, ExpenseResponse, ExpenseUpdate
+from app.models import Expense, User, Category
 from app.security import get_current_user
 
 router = APIRouter(
@@ -113,6 +120,87 @@ def get_expenses(
 
     return query.all()
 
+@router.get("/summary", response_model=ExpenseSummary)
+def get_expense_summary(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+
+    summary = (
+        db.query(
+            func.count(Expense.id),
+            func.coalesce(func.sum(Expense.amount), 0),
+            func.coalesce(func.avg(Expense.amount), 0),
+            func.coalesce(func.max(Expense.amount), 0),
+            func.coalesce(func.min(Expense.amount), 0),
+        )
+        .filter(Expense.user_id == current_user.id)
+        .first()
+    )
+
+    return ExpenseSummary(
+        total_expenses=summary[0],
+        total_amount=float(summary[1]),
+        average_expense=float(summary[2]),
+        highest_expense=float(summary[3]),
+        lowest_expense=float(summary[4]),
+    )
+
+
+@router.get("/category-summary", response_model=List[CategorySummary])
+def get_category_summary(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+
+    category_totals = (
+        db.query(
+            Category.name.label("category"),
+            func.sum(Expense.amount).label("total")
+        )
+        .join(Category, Expense.category_id == Category.id)
+        .filter(Expense.user_id == current_user.id)
+        .group_by(Category.name)
+        .order_by(func.sum(Expense.amount).desc())
+        .all()
+    )
+
+    return [
+        CategorySummary(
+            category=row.category,
+            total=float(row.total)
+        )
+        for row in category_totals
+    ]
+
+@router.get("/monthly-summary", response_model=List[MonthlySummary])
+def get_monthly_summary(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+
+    month = func.to_char(Expense.expense_date, "YYYY-MM").label("month")
+
+    monthly_totals = (
+        db.query(
+            month,
+            func.sum(Expense.amount).label("total")
+        )
+        .filter(
+            Expense.user_id == current_user.id
+        )
+        .group_by(month)
+        .order_by(month)
+        .all()
+    )
+
+    return [
+        MonthlySummary(
+            month=row.month,
+            total=float(row.total)
+        )
+        for row in monthly_totals
+    ]
 
 @router.get("/{expense_id}", response_model=ExpenseResponse)
 def get_expense(
