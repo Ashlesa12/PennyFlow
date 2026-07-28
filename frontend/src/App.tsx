@@ -1,10 +1,11 @@
+import { BrowserRouter } from "react-router-dom";
+import { AppRouter } from "./routes/AppRouter";
+
 function App() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-900">
-      <h1 className="text-5xl font-bold text-emerald-500">
-        PennyFlow 💰
-      </h1>
-    </div>
+    <BrowserRouter>
+      <AppRouter />
+    </BrowserRouter>
   );
 }
 
