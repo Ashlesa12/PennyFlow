@@ -1,68 +1,123 @@
-import { Link } from "react-router-dom";
-import {
-  Alert,
-  Button,
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  Input,
-} from "../components/ui";
+import { type FormEvent, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Button, Input } from "../components/ui";
+import { AuthLayout } from "./AuthLayout";
+import { api, setAuthToken } from "../api/client";
 
 export default function LoginPage() {
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    setError("");
+
+    if (!email || !password) {
+      setError("Please fill in all fields");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const params = new URLSearchParams();
+      params.append("username", email);
+      params.append("password", password);
+
+      const res = await api.post("/auth/login", params, {
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      });
+
+      setAuthToken(res.data.access_token);
+      navigate("/dashboard", { replace: true });
+    } catch (err: unknown) {
+      const detail =
+        (err as { response?: { data?: { detail?: string } } })?.response?.data
+          ?.detail;
+      setError(detail || "Invalid email or password");
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-[#F7F6F2] p-6">
-      <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-        <div className="absolute -right-40 -top-40 h-[600px] w-[600px] rounded-full bg-emerald-500/5 blur-[150px]" />
-        <div className="absolute -bottom-40 -left-40 h-[500px] w-[500px] rounded-full bg-amber-400/3 blur-[120px]" />
-      </div>
+    <AuthLayout>
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-sm rounded-3xl border border-white/40 bg-white/70 p-8 shadow-xl shadow-black/[0.02] backdrop-blur-xl transition-all duration-300 hover:shadow-2xl"
+      >
+        {/* Header */}
+        <div className="text-center">
+          <h1 className="text-xl font-bold tracking-tight text-text-primary">
+            Welcome Back 👋
+          </h1>
+          <p className="mt-1 text-sm text-text-secondary">
+            Continue where you left off.
+          </p>
+        </div>
 
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-sm shadow-emerald-500/20">
-            <span className="text-lg font-bold text-white">P</span>
+        {/* Error */}
+        {error && (
+          <div className="mt-6 rounded-xl bg-danger/10 px-4 py-3 text-sm font-medium text-danger">
+            {error}
           </div>
-          <CardTitle>Welcome back</CardTitle>
-          <CardDescription>
-            Sign in to your PennyFlow account
-          </CardDescription>
-        </CardHeader>
+        )}
 
-        <CardContent className="space-y-5">
-          <Alert variant="default">
-            <span className="font-medium">Phase 1 coming next</span> &mdash;
-            Authentication forms will be wired up in the next phase.
-          </Alert>
-
+        {/* Form fields */}
+        <div className="mt-6 space-y-5">
           <Input
             label="Email"
             type="email"
             placeholder="you@example.com"
-            disabled
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={isSubmitting}
           />
           <Input
             label="Password"
             type="password"
             placeholder="••••••••"
-            disabled
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            disabled={isSubmitting}
           />
 
-          <Button className="w-full" disabled>
-            Sign in
-          </Button>
-
-          <p className="text-center text-sm text-neutral-500">
-            Don&apos;t have an account?{" "}
-            <Link
-              to="/signup"
-              className="font-medium text-emerald-600 underline-offset-4 hover:underline"
+          {/* Remember me + Forgot password */}
+          <div className="flex items-center justify-between">
+            <label className="flex cursor-pointer items-center gap-2">
+              <input
+                type="checkbox"
+                className="h-4 w-4 rounded border-white/40 bg-white/60 text-accent accent-accent focus:ring-accent/30"
+              />
+              <span className="text-sm text-text-secondary">Remember me</span>
+            </label>
+            <button
+              type="button"
+              className="text-sm font-medium text-accent transition-colors hover:text-accent/80"
             >
-              Sign up
-            </Link>
-          </p>
-        </CardContent>
-      </Card>
-    </div>
+              Forgot password?
+            </button>
+          </div>
+
+          <Button className="w-full" isLoading={isSubmitting}>
+            Sign In
+          </Button>
+        </div>
+
+        {/* Bottom link */}
+        <p className="mt-8 text-center text-sm text-text-secondary">
+          Don&apos;t have an account?{" "}
+          <Link
+            to="/signup"
+            className="font-medium text-accent transition-colors hover:text-accent/80"
+          >
+            Create Account
+          </Link>
+        </p>
+      </form>
+    </AuthLayout>
   );
 }

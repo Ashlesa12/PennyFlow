@@ -15,10 +15,12 @@ PennyFlow is a full-stack personal expense tracker that helps users manage their
 - JWT Authentication
 - Python-dotenv
 
-### Frontend *(Coming Soon)*
+### Frontend
 - React
 - TypeScript
 - Tailwind CSS
+- Recharts (Charts & Analytics)
+- Indian Rupee (Rs.) currency formatting
 
 ---
 
@@ -39,11 +41,14 @@ PennyFlow is a full-stack personal expense tracker that helps users manage their
 - Expense Filtering
 - Expense Sorting
 
-### 🚧 In Progress
+### ✅ Completed
 - Expense Summary API
+- Dashboard Page with Charts
+- Frontend Setup (React + TypeScript + Tailwind)
+- Indian Rupee (Rs.) currency display
+
+### 🚧 In Progress
 - Category Management
-- Dashboard
-- Frontend Development
 
 ---
 
@@ -55,7 +60,8 @@ PennyFlow/
 ├── backend/
 │   ├── app/
 │   │   ├── routes/
-│   │   │   └── auth.py
+│   │   │   ├── auth.py
+│   │   │   └── expenses.py
 │   │   ├── services/
 │   │   │   └── auth_service.py
 │   │   ├── database.py
@@ -68,6 +74,22 @@ PennyFlow/
 │   ├── requirements.txt
 │   ├── .env
 │   └── .gitignore
+│
+├── frontend/
+│   ├── src/
+│   │   ├── api/
+│   │   ├── components/
+│   │   ├── constants/
+│   │   ├── hooks/
+│   │   ├── pages/
+│   │   ├── types/
+│   │   └── utils/
+│   ├── public/
+│   ├── index.html
+│   ├── package.json
+│   ├── tsconfig.json
+│   ├── vite.config.ts
+│   └── tailwind.config.js
 │
 ├── .gitignore
 └── README.md
@@ -182,11 +204,11 @@ Current authentication flow:
 - [x] User Login
 - [x] JWT Authentication
 - [x] Protected Routes
-- [ ] Expense CRUD
+- [x] Expense CRUD
 - [ ] Categories
-- [ ] Dashboard APIs
-- [ ] React Frontend
-- [ ] Charts & Analytics
+- [x] Dashboard APIs
+- [x] React Frontend
+- [x] Charts & Analytics
 - [ ] Deployment
 
 ---

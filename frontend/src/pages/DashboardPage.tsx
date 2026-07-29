@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   TrendingDown,
@@ -24,6 +24,9 @@ import {
   Cell,
 } from "recharts";
 import type { TooltipProps } from "recharts";
+import { api } from "../api/client";
+import { formatCurrency } from "../utils/formatCurrency";
+import { getCategoryName } from "../constants/categories";
 import {
   Card,
   CardContent,
@@ -31,6 +34,12 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui";
+import type {
+  ExpenseSummary,
+  CategorySummary,
+  Expense,
+  User,
+} from "../types";
 
 /* ─── Types ─────────────────────────────────────── */
 
@@ -47,12 +56,10 @@ interface WeeklyPoint {
   spend: number;
 }
 
-interface ExpenseRow {
-  category: string;
+interface CategorySlice {
+  name: string;
+  value: number;
   color: string;
-  title: string;
-  date: string;
-  amount: string;
 }
 
 interface QuickAction {
@@ -62,71 +69,18 @@ interface QuickAction {
   disabled?: boolean;
 }
 
-interface CategorySlice {
-  name: string;
-  value: number;
-  color: string;
-}
+/* ─── Constants ──────────────────────────────────── */
 
-/* ─── Placeholder Data ──────────────────────────── */
-
-const overviewItems: OverviewItem[] = [
-  {
-    icon: TrendingDown,
-    title: "Total Expenses",
-    amount: "$4,920.00",
-    subtitle: "2.1% vs last month",
-    accent: "danger",
-  },
-  {
-    icon: Calendar,
-    title: "This Month",
-    amount: "$1,245.00",
-    subtitle: "12 transactions so far",
-    accent: "accent",
-  },
-  {
-    icon: Receipt,
-    title: "Average Expense",
-    amount: "$54.67",
-    subtitle: "Across 90 transactions",
-    accent: "accent",
-  },
-  {
-    icon: List,
-    title: "Total Transactions",
-    amount: "156",
-    subtitle: "8 this month",
-    accent: "accent",
-  },
-];
-
-const weeklyData: WeeklyPoint[] = [
-  { day: "Mon", spend: 580 },
-  { day: "Tue", spend: 720 },
-  { day: "Wed", spend: 450 },
-  { day: "Thu", spend: 890 },
-  { day: "Fri", spend: 340 },
-  { day: "Sat", spend: 620 },
-  { day: "Sun", spend: 280 },
-];
-
-const categoryData: CategorySlice[] = [
-  { name: "Food", value: 35, color: "#10B981" },
-  { name: "Transport", value: 20, color: "#3B82F6" },
-  { name: "Shopping", value: 15, color: "#8B5CF6" },
-  { name: "Bills", value: 12, color: "#F59E0B" },
-  { name: "Entertainment", value: 10, color: "#EC4899" },
-  { name: "Healthcare", value: 8, color: "#06B6D4" },
-];
-
-const recentExpenses: ExpenseRow[] = [
-  { category: "Food", color: "#10B981", title: "Burger King", date: "Today", amount: "-$18.00" },
-  { category: "Transport", color: "#3B82F6", title: "Uber", date: "Yesterday", amount: "-$11.00" },
-  { category: "Bills", color: "#F59E0B", title: "Electricity", date: "2 days ago", amount: "-$45.00" },
-  { category: "Shopping", color: "#8B5CF6", title: "Amazon", date: "4 days ago", amount: "-$79.00" },
-  { category: "Healthcare", color: "#06B6D4", title: "Pharmacy", date: "Last week", amount: "-$22.00" },
-];
+const CATEGORY_COLORS: Record<string, string> = {
+  "Food & Dining": "#10B981",
+  Transportation: "#3B82F6",
+  Shopping: "#8B5CF6",
+  Entertainment: "#EC4899",
+  "Bills & Utilities": "#F59E0B",
+  Health: "#06B6D4",
+  Travel: "#F97316",
+  Other: "#6B7280",
+};
 
 const quickActions: QuickAction[] = [
   { icon: Plus, label: "Add Expense", to: "/expenses" },
@@ -153,6 +107,21 @@ function formatDate(date: Date): string {
   });
 }
 
+function formatRelativeDate(date: Date): string {
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  if (diffDays === 0) return "Today";
+  if (diffDays === 1) return "Yesterday";
+  if (diffDays < 7) return `${diffDays} days ago`;
+  return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
+function isCurrentMonth(date: Date): boolean {
+  const now = new Date();
+  return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
+}
+
 /* ─── Chart Tooltip ─────────────────────────────── */
 
 function ChartTooltip({ active, payload, label }: TooltipProps<number, string>) {
@@ -161,7 +130,7 @@ function ChartTooltip({ active, payload, label }: TooltipProps<number, string>) 
       <div className="rounded-xl border border-white/40 bg-white/80 px-3 py-2 text-sm shadow-lg shadow-black/[0.02] backdrop-blur-xl">
         <p className="text-xs text-text-secondary">{label}</p>
         <p className="font-semibold text-text-primary">
-          ${payload[0].value?.toLocaleString()}
+          Rs. {payload[0].value?.toLocaleString()}
         </p>
       </div>
     );
@@ -237,7 +206,7 @@ function WeeklyChart({ data }: { data: WeeklyPoint[] }) {
                 axisLine={false}
                 tickLine={false}
                 tick={{ fontSize: 12, fill: "#8c8a8b" }}
-                tickFormatter={(v: number) => `$${v}`}
+                tickFormatter={(v: number) => `Rs. ${v}`}
               />
               <Tooltip content={<ChartTooltip />} />
               <Area
@@ -304,7 +273,7 @@ function CategoryDonut({ data }: { data: CategorySlice[] }) {
   );
 }
 
-function ExpensesTable({ rows }: { rows: ExpenseRow[] }) {
+function ExpensesTable({ rows }: { rows: Expense[] }) {
   return (
     <Card>
       <CardHeader>
@@ -334,30 +303,34 @@ function ExpensesTable({ rows }: { rows: ExpenseRow[] }) {
               </tr>
             </thead>
             <tbody>
-              {rows.map((row, i) => (
+              {rows.map((expense) => (
                 <tr
-                  key={`${row.title}-${i}`}
+                  key={expense.id}
                   className="border-b border-white/20 transition-colors last:border-none hover:bg-black/[0.02]"
                 >
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
                       <span
                         className="h-2.5 w-2.5 rounded-full"
-                        style={{ backgroundColor: row.color }}
+                        style={{
+                          backgroundColor:
+                            CATEGORY_COLORS[getCategoryName(expense.category_id)] ||
+                            "#6B7280",
+                        }}
                       />
                       <span className="text-sm text-text-primary">
-                        {row.category}
+                        {getCategoryName(expense.category_id)}
                       </span>
                     </div>
                   </td>
                   <td className="px-6 py-4 text-sm text-text-primary">
-                    {row.title}
+                    {expense.title}
                   </td>
                   <td className="px-6 py-4 text-sm text-text-secondary">
-                    {row.date}
+                    {formatRelativeDate(new Date(expense.expense_date))}
                   </td>
                   <td className="px-6 py-4 text-right text-sm font-medium text-text-primary">
-                    {row.amount}
+                    -{formatCurrency(Number(expense.amount))}
                   </td>
                 </tr>
               ))}
@@ -426,9 +399,128 @@ function QuickActionsGrid({ actions }: { actions: QuickAction[] }) {
 
 /* ─── Page ──────────────────────────────────────── */
 
+interface MonthlySummary {
+  month: string;
+  total: number;
+}
+
 export default function DashboardPage() {
+  const [user, setUser] = useState<User | null>(null);
+  const [summary, setSummary] = useState<ExpenseSummary | null>(null);
+  const [categorySummary, setCategorySummary] = useState<CategorySummary[]>([]);
+  const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [userRes, summaryRes, categoryRes, expensesRes] =
+          await Promise.all([
+            api.get<User>("/auth/me"),
+            api.get<ExpenseSummary>("/expenses/summary"),
+            api.get<CategorySummary[]>("/expenses/category-summary"),
+            api.get<Expense[]>("/expenses/", {
+              params: { sort_by: "date", order: "desc" },
+            }),
+          ]);
+
+        setUser(userRes.data);
+        setSummary(summaryRes.data);
+        setCategorySummary(categoryRes.data);
+        setExpenses(expensesRes.data);
+      } catch (err) {
+        console.error("Failed to load dashboard data", err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchData();
+  }, []);
+
   const greeting = useMemo(() => getGreeting(), []);
   const today = useMemo(() => formatDate(new Date()), []);
+  const userName = user?.name || "there";
+
+  const recentExpenses = useMemo(() => expenses.slice(0, 5), [expenses]);
+
+  const currentMonthExpenses = useMemo(
+    () => expenses.filter((e) => isCurrentMonth(new Date(e.expense_date))),
+    [expenses],
+  );
+
+  const overviewItems: OverviewItem[] = useMemo(() => {
+    if (!summary) return [];
+
+    const monthTotal = currentMonthExpenses.reduce(
+      (sum, e) => sum + Number(e.amount),
+      0,
+    );
+
+    return [
+      {
+        icon: TrendingDown,
+        title: "Total Expenses",
+        amount: formatCurrency(summary.total_amount),
+        subtitle: `${summary.total_expenses} transactions total`,
+        accent: "danger" as const,
+      },
+      {
+        icon: Calendar,
+        title: "This Month",
+        amount: formatCurrency(monthTotal),
+        subtitle: `${currentMonthExpenses.length} transactions so far`,
+        accent: "accent" as const,
+      },
+      {
+        icon: Receipt,
+        title: "Average Expense",
+        amount: formatCurrency(summary.average_expense),
+        subtitle: `Across ${summary.total_expenses} transactions`,
+        accent: "accent" as const,
+      },
+      {
+        icon: List,
+        title: "Total Transactions",
+        amount: String(summary.total_expenses),
+        subtitle: `${currentMonthExpenses.length} this month`,
+        accent: "accent" as const,
+      },
+    ];
+  }, [summary, currentMonthExpenses]);
+
+  const weeklyData: WeeklyPoint[] = useMemo(() => {
+    const now = new Date();
+    return Array.from({ length: 7 }, (_, i) => {
+      const date = new Date(now);
+      date.setDate(date.getDate() - (6 - i));
+      const dayName = date.toLocaleDateString("en-US", { weekday: "short" });
+      const total = expenses
+        .filter((e) => {
+          const d = new Date(e.expense_date);
+          return d.toDateString() === date.toDateString();
+        })
+        .reduce((sum, e) => sum + Number(e.amount), 0);
+      return { day: dayName, spend: total };
+    });
+  }, [expenses]);
+
+  const categoryData: CategorySlice[] = useMemo(() => {
+    const total = categorySummary.reduce((sum, c) => sum + c.total, 0);
+    return categorySummary.map((c) => ({
+      name: c.category,
+      value: total > 0 ? Math.round((c.total / total) * 100) : 0,
+      color: CATEGORY_COLORS[c.category] || "#6B7280",
+    }));
+  }, [categorySummary]);
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-accent border-t-transparent" />
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-6xl space-y-8">
@@ -436,7 +528,7 @@ export default function DashboardPage() {
       <header className="flex flex-wrap items-start justify-between gap-6">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-text-primary">
-            {greeting}, Ashlesa 👋
+            {greeting}, {userName} 👋
           </h1>
           <p className="mt-1 text-sm text-text-secondary">
             Here&apos;s an overview of your spending.
@@ -469,7 +561,21 @@ export default function DashboardPage() {
       </div>
 
       {/* ── 4. Recent Expenses ──────────────────── */}
-      <ExpensesTable rows={recentExpenses} />
+      {recentExpenses.length > 0 ? (
+        <ExpensesTable rows={recentExpenses} />
+      ) : (
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Expenses</CardTitle>
+            <CardDescription>Your latest transactions</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="py-8 text-center text-sm text-text-secondary">
+              No expenses yet. Add your first expense to get started.
+            </p>
+          </CardContent>
+        </Card>
+      )}
 
       {/* ── 5. Quick Actions ────────────────────── */}
       <QuickActionsGrid actions={quickActions} />

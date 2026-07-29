@@ -26,10 +26,12 @@ export function AppRouter() {
         <Route path="/signup" element={<SignupPage />} />
       </Route>
 
-    <Route element={<AppLayout><Outlet /></AppLayout>}>
-  <Route path="/dashboard" element={<DashboardPage />} />
-  <Route path="/expenses" element={<ExpensesPage />} />
-</Route>
+      <Route element={<ProtectedRoute />}>
+        <Route element={<AppLayout><Outlet /></AppLayout>}>
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/expenses" element={<ExpensesPage />} />
+        </Route>
+      </Route>
 
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="*" element={<NotFoundPage />} />
