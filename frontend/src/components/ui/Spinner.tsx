@@ -12,13 +12,17 @@ export interface SpinnerProps {
   label?: string;
 }
 
-export function Spinner({ size = "md", className, label = "Loading" }: SpinnerProps) {
+export function Spinner({
+  size = "md",
+  className,
+  label = "Loading",
+}: SpinnerProps) {
   return (
     <div
       role="status"
       aria-label={label}
       className={cn(
-        "animate-spin rounded-full border-neutral-300 border-t-neutral-900",
+        "animate-spin rounded-full border-neutral-200/60 border-t-neutral-800",
         sizes[size],
         className,
       )}

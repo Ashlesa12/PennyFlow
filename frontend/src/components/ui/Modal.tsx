@@ -46,7 +46,7 @@ export function Modal({
       <button
         type="button"
         aria-label="Close modal overlay"
-        className="absolute inset-0 bg-neutral-900/40 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/[0.04] backdrop-blur-sm"
         onClick={onClose}
       />
 
@@ -55,14 +55,17 @@ export function Modal({
         aria-modal="true"
         aria-labelledby={title ? "modal-title" : undefined}
         className={cn(
-          "relative z-10 w-full max-w-lg rounded-3xl border border-neutral-200 bg-white p-6 shadow-xl",
+          "relative z-10 w-full max-w-lg rounded-3xl border border-white/40 bg-white/70 p-6 shadow-xl shadow-black/[0.02] backdrop-blur-xl",
           className,
         )}
       >
-        <div className="mb-4 flex items-start justify-between gap-4">
-          <div className="space-y-1">
+        <div className="mb-5 flex items-start justify-between gap-4">
+          <div className="space-y-1.5">
             {title ? (
-              <h2 id="modal-title" className="text-lg font-semibold text-neutral-900">
+              <h2
+                id="modal-title"
+                className="text-lg font-semibold tracking-tight text-neutral-900"
+              >
                 {title}
               </h2>
             ) : null}

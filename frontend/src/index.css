@@ -1,1 +1,303 @@
+/* ══════════════════════════════════════════════════════════════
+   PennyFlow Design System
+   ─────────────────────────────────────────────
+   Visual foundation for the entire application.
+   All components consume these tokens exclusively.
+   ══════════════════════════════════════════════════════════════ */
+
 @import "tailwindcss";
+
+/* ══════════════════════════════════════════════════════════════
+   1. THEME TOKENS
+   ─────────────────────────────────────────────
+   Tailwind v4 @theme generates both CSS variables
+   AND utility classes (bg-surface, text-accent, etc.).
+   ══════════════════════════════════════════════════════════════ */
+@theme {
+  /* ─── Color Tokens ──────────────────────
+     A warm, premium fintech palette.
+     No pure whites. No cool grays.
+     Every color is slightly warmed. */
+
+  --color-bg: #F7F6F2;
+  --color-surface: #ffffff;
+  --color-surface-elevated: rgba(255, 255, 255, 0.65);
+
+  --color-border: rgba(0, 0, 0, 0.06);
+  --color-border-strong: rgba(0, 0, 0, 0.10);
+
+  --color-text-primary: #1c1b1e;
+  --color-text-secondary: #8c8a8b;
+  --color-text-tertiary: #b3b0b2;
+
+  --color-accent: #10b981;
+  --color-accent-soft: rgba(16, 185, 129, 0.08);
+
+  --color-success: #059669;
+  --color-danger: #ef4444;
+  --color-warning: #f59e0b;
+  --color-info: #3b82f6;
+
+  /* ─── Typography ────────────────────────
+     Inter as primary with robust fallbacks. */
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, sans-serif;
+
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1rem;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.375rem;
+  --text-base: 1rem;
+  --text-base--line-height: 1.5rem;
+  --text-lg: 1.125rem;
+  --text-lg--line-height: 1.625rem;
+  --text-xl: 1.25rem;
+  --text-xl--line-height: 1.75rem;
+  --text-2xl: 1.5rem;
+  --text-2xl--line-height: 2rem;
+  --text-3xl: 1.875rem;
+  --text-3xl--line-height: 2.375rem;
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* ─── Spacing (8px system) ─────────────
+     Every spacing value is a multiple of 0.5rem (8px). */
+
+  --spacing-px: 1px;
+  --spacing-0: 0rem;
+  --spacing-0-5: 0.125rem;
+  --spacing-1: 0.25rem;
+  --spacing-1-5: 0.375rem;
+  --spacing-2: 0.5rem;
+  --spacing-2-5: 0.625rem;
+  --spacing-3: 0.75rem;
+  --spacing-3-5: 0.875rem;
+  --spacing-4: 1rem;
+  --spacing-5: 1.25rem;
+  --spacing-6: 1.5rem;
+  --spacing-7: 1.75rem;
+  --spacing-8: 2rem;
+  --spacing-9: 2.25rem;
+  --spacing-10: 2.5rem;
+  --spacing-11: 2.75rem;
+  --spacing-12: 3rem;
+  --spacing-14: 3.5rem;
+  --spacing-16: 4rem;
+  --spacing-20: 5rem;
+  --spacing-24: 6rem;
+  --spacing-28: 7rem;
+  --spacing-32: 8rem;
+  --spacing-36: 9rem;
+  --spacing-40: 10rem;
+  --spacing-44: 11rem;
+  --spacing-48: 12rem;
+  --spacing-52: 13rem;
+  --spacing-56: 14rem;
+  --spacing-60: 15rem;
+  --spacing-64: 16rem;
+  --spacing-72: 18rem;
+  --spacing-80: 20rem;
+  --spacing-96: 24rem;
+
+  /* ─── Border Radius ────────────────────
+     Large, soft radii for a premium feel. */
+
+  --radius-none: 0;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-2xl: 2rem;
+  --radius-3xl: 2.5rem;
+  --radius-full: 9999px;
+
+  /* ─── Shadows ──────────────────────────
+     Multi-layered, soft, elegant.
+     Each shadow uses 2-3 low-opacity layers
+     for a natural depth effect (Apple-inspired). */
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.04), 0 2px 4px rgba(0, 0, 0, 0.02);
+  --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.04),
+    0 4px 8px rgba(0, 0, 0, 0.02);
+  --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.05),
+    0 8px 16px rgba(0, 0, 0, 0.02);
+  --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.04);
+
+  /* ─── Animation & Easing ─────────────── */
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-float: float 6s var(--ease-out-expo) infinite;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   2. KEYFRAMES
+   ══════════════════════════════════════════════════════════════ */
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   3. RUNTIME CSS VARIABLES
+   ─────────────────────────────────────────────
+   Available via var(--pf-*) in component stylesheets
+   or inline styles. These tokens fall outside Tailwind's
+   built-in @theme namespaces.
+   ══════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ─── Motion ─────────────────── */
+  --pf-transition-fast: 150ms ease;
+  --pf-transition-base: 200ms ease;
+  --pf-transition-slow: 300ms ease;
+  --pf-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* ─── Glass surface defaults ─── */
+  --pf-glass-blur: 20px;
+  --pf-glass-border: rgba(255, 255, 255, 0.35);
+  --pf-glass-border-strong: rgba(255, 255, 255, 0.5);
+
+  /* ─── Layered background ─────── */
+  --pf-bg-gradient: radial-gradient(
+      ellipse 80% 50% at 0% 0%,
+      rgba(16, 185, 129, 0.04) 0%,
+      transparent 100%
+    ),
+    radial-gradient(
+      ellipse 60% 40% at 100% 100%,
+      rgba(251, 191, 36, 0.03) 0%,
+      transparent 100%
+    );
+}
+
+/* ══════════════════════════════════════════════════════════════
+   4. CUSTOM UTILITY CLASSES
+   ─────────────────────────────────────────────
+   Composable, reusable. Use in className alongside
+   Tailwind utilities.
+   ══════════════════════════════════════════════════════════════ */
+
+/* ─── Glass Surface ───────────────
+     Apple-inspired frosted glass.
+     Do NOT overuse — transparency harms legibility
+     when layered too deep.
+
+     Usage:  <div className="glass rounded-3xl p-6">…</div> */
+
+@utility glass {
+  background: var(--color-surface-elevated);
+  backdrop-filter: blur(var(--pf-glass-blur));
+  -webkit-backdrop-filter: blur(var(--pf-glass-blur));
+  border: 1px solid var(--pf-glass-border);
+}
+
+/* ─── Strong Glass ────────────────
+     Higher-opacity variant for sidebars, modals,
+     and surfaces that need more text legibility. */
+
+@utility glass-strong {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--pf-glass-border-strong);
+}
+
+/* ─── Layered Background ──────────
+     Applies the warm background color plus
+     subtle radial gradient blobs for depth.
+
+     Usage:  <div className="bg-layer min-h-screen">…</div> */
+
+@utility bg-layer {
+  background-color: var(--color-bg);
+  background-image: var(--pf-bg-gradient);
+}
+
+/* ─── Hover Elevation ─────────────
+     Subtle lift effect for interactive cards.
+     Apply the base class, and hover is automatic.
+
+     Usage:  <div className="hover-elevate rounded-3xl">…</div> */
+
+@utility hover-elevate {
+  transition: transform var(--pf-transition-base),
+    box-shadow var(--pf-transition-base);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   5. GLOBAL BASE STYLES
+   ─────────────────────────────────────────────
+   Placed in a @layer so they cascade before utilities,
+   allowing utilities to override when needed.
+   ══════════════════════════════════════════════════════════════ */
+
+@layer base {
+  /* ─── Body ────────────────────── */
+  body {
+    font-family: var(--font-sans);
+    color: var(--color-text-primary);
+    background-color: var(--color-bg);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* ─── Text Selection ──────────── */
+  ::selection {
+    background-color: var(--color-accent-soft);
+    color: var(--color-accent);
+  }
+
+  /* ─── Focus Ring ────────────────
+     Accessible yet elegant.
+     Uses accent color with a subtle glow. */
+  *:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  /* ─── Scrollbar ─────────────────
+     Minimal, matches the design system.
+     Thin track, rounded thumb, no harsh colors.
+
+     Note: Firefox uses scrollbar-width/color below. */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.10);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.16);
+  }
+
+  /* Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.10) transparent;
+  }
+}

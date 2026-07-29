@@ -1,5 +1,5 @@
 import * as React from "react";
-import { cn } from "../../utils/cn"; // Adjust path if your cn helper is directly in src/utils
+import { cn } from "../../utils/cn";
 
 interface AlertProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: "default" | "destructive" | "success";
@@ -8,9 +8,12 @@ interface AlertProps extends React.HTMLAttributes<HTMLDivElement> {
 export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
   ({ className, variant = "default", children, ...props }, ref) => {
     const variantStyles = {
-      default: "bg-slate-100 text-slate-900 border-slate-200",
-      destructive: "bg-red-50 text-red-900 border-red-200 dark:bg-red-950/50 dark:text-red-200 dark:border-red-800",
-      success: "bg-emerald-50 text-emerald-900 border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-200 dark:border-emerald-800",
+      default:
+        "bg-white/50 backdrop-blur-sm text-neutral-700 border border-white/40",
+      destructive:
+        "bg-red-50/80 backdrop-blur-sm text-red-800 border border-red-200/60",
+      success:
+        "bg-emerald-50/80 backdrop-blur-sm text-emerald-800 border border-emerald-200/60",
     };
 
     return (
@@ -18,16 +21,16 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
         ref={ref}
         role="alert"
         className={cn(
-          "relative w-full rounded-xl border p-4 text-sm [&>svg~*]:pl-7 [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground",
+          "relative w-full rounded-2xl border p-4 text-sm [&>svg~*]:pl-7 [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground",
           variantStyles[variant],
-          className
+          className,
         )}
         {...props}
       >
         {children}
       </div>
     );
-  }
+  },
 );
 
 Alert.displayName = "Alert";

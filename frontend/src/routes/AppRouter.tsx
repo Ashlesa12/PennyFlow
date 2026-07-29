@@ -1,5 +1,6 @@
 import { Navigate, Outlet, Route, Routes } from "react-router-dom";
 import { getAuthToken } from "../api/client";
+import { AppLayout } from "../components/layout/AppLayout";
 import DashboardPage from "../pages/DashboardPage";
 import ExpensesPage from "../pages/ExpensesPage";
 import LoginPage from "../pages/LoginPage";
@@ -25,10 +26,10 @@ export function AppRouter() {
         <Route path="/signup" element={<SignupPage />} />
       </Route>
 
-      <Route element={<ProtectedRoute />}>
-        <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/expenses" element={<ExpensesPage />} />
-      </Route>
+    <Route element={<AppLayout><Outlet /></AppLayout>}>
+  <Route path="/dashboard" element={<DashboardPage />} />
+  <Route path="/expenses" element={<ExpensesPage />} />
+</Route>
 
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="*" element={<NotFoundPage />} />

@@ -2,10 +2,12 @@ import { type HTMLAttributes, forwardRef } from "react";
 import { cn } from "../../utils/cn";
 
 const variants = {
-  default: "bg-white border border-neutral-200 text-neutral-900 shadow-sm",
-  dark: "bg-neutral-900 border border-neutral-800 text-white shadow-sm",
+  default:
+    "bg-white/70 backdrop-blur-xl border border-white/40 text-neutral-900 shadow-lg shadow-black/[0.02]",
+  dark:
+    "bg-neutral-900/80 backdrop-blur-xl border border-neutral-700/50 text-white shadow-lg shadow-black/10",
   dashed:
-    "bg-neutral-50 border-2 border-dashed border-neutral-300 text-neutral-500",
+    "bg-white/40 backdrop-blur-sm border-2 border-dashed border-neutral-200/60 text-neutral-500",
 } as const;
 
 export interface CardProps extends HTMLAttributes<HTMLDivElement> {
@@ -17,7 +19,7 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
     return (
       <div
         ref={ref}
-        className={cn("rounded-3xl p-6", variants[variant], className)}
+        className={cn("rounded-3xl p-6 lg:p-8", variants[variant], className)}
         {...props}
       />
     );
@@ -30,7 +32,7 @@ export function CardHeader({
   className,
   ...props
 }: HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("mb-4 space-y-1", className)} {...props} />;
+  return <div className={cn("mb-5 space-y-1.5", className)} {...props} />;
 }
 
 export function CardTitle({
@@ -67,7 +69,7 @@ export function CardFooter({
 }: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn("mt-4 flex items-center gap-3", className)}
+      className={cn("mt-6 flex items-center gap-3", className)}
       {...props}
     />
   );
