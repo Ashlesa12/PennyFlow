@@ -1,6 +1,7 @@
 import { Navigate, Outlet, Route, Routes } from "react-router-dom";
 import { getAuthToken } from "../api/client";
 import { AppLayout } from "../components/layout/AppLayout";
+import AnalyticsPage from "../pages/AnalyticsPage";
 import DashboardPage from "../pages/DashboardPage";
 import ExpensesPage from "../pages/ExpensesPage";
 import LoginPage from "../pages/LoginPage";
@@ -28,6 +29,7 @@ export function AppRouter() {
 
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout><Outlet /></AppLayout>}>
+          <Route path="/analytics" element={<AnalyticsPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/expenses" element={<ExpensesPage />} />
         </Route>

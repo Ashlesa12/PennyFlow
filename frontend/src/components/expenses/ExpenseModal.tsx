@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { Modal, Input, Button } from "../ui";
-import { getCategoryName } from "../../constants/categories";
 import { toISODateString } from "../../utils/formatDate";
-import type { Expense, ExpenseCreate, ExpenseUpdate } from "../../types";
+import type { Expense, ExpenseCreate, ExpenseUpdate, Category } from "../../types";
 
 type Mode = "create" | "edit";
 
@@ -12,6 +11,7 @@ interface ExpenseModalProps {
   onSave: (data: ExpenseCreate | ExpenseUpdate) => Promise<boolean>;
   mode: Mode;
   expense?: Expense | null;
+  categories: Category[];
 }
 
 const defaultForm: ExpenseCreate = {
@@ -27,6 +27,7 @@ export function ExpenseModal({
   onSave,
   mode,
   expense,
+  categories,
 }: ExpenseModalProps) {
   const [form, setForm] = useState<ExpenseCreate | ExpenseUpdate>(defaultForm);
   const [isSaving, setIsSaving] = useState(false);
@@ -42,11 +43,14 @@ export function ExpenseModal({
           category_id: expense.category_id,
         });
       } else {
-        setForm(defaultForm);
+        setForm({
+          ...defaultForm,
+          category_id: categories[0]?.id ?? 1,
+        });
       }
       setError("");
     }
-  }, [open, mode, expense]);
+  }, [open, mode, expense, categories]);
 
   const handleSave = async () => {
     if (mode === "create") {
@@ -123,19 +127,19 @@ export function ExpenseModal({
         />
 
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-neutral-700">
+          <label className="block text-sm font-medium text-text-primary">
             Category
           </label>
           <select
-            value={"category_id" in form ? (form as ExpenseCreate).category_id : 1}
+            value={"category_id" in form ? (form as ExpenseCreate).category_id : categories[0]?.id ?? 1}
             onChange={(e) =>
               update({ category_id: Number(e.target.value) })
             }
-            className="flex h-11 w-full rounded-2xl border border-white/40 bg-white/60 px-4 text-sm text-neutral-900 backdrop-blur-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/30 focus-visible:border-emerald-500/50"
+            className="flex h-11 w-full rounded-2xl border border-white/40 bg-white/60 px-4 text-sm text-text-primary backdrop-blur-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/30 focus-visible:border-emerald-500/50"
           >
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((id) => (
-              <option key={id} value={id}>
-                {getCategoryName(id)}
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.name}
               </option>
             ))}
           </select>

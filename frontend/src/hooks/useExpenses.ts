@@ -14,6 +14,7 @@ export function useExpenses() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const abortRef = useRef(false);
+  const prevRef = useRef<Expense[]>([]);
 
   const load = useCallback(async (filters?: ExpenseFilters) => {
     abortRef.current = false;
@@ -33,51 +34,77 @@ export function useExpenses() {
     async (data: ExpenseCreate, filters?: ExpenseFilters) => {
       setError("");
       setSuccess("");
+
+      const optimistic: Expense = {
+        id: -Date.now(),
+        title: data.title,
+        amount: data.amount,
+        expense_date: data.expense_date,
+        category_id: data.category_id,
+        user_id: 0,
+      };
+
+      prevRef.current = expenses;
+      setExpenses((prev) => [optimistic, ...prev]);
+
       try {
         await apiCreateExpense(data);
         setSuccess("Expense added successfully");
         await load(filters);
         return true;
       } catch {
+        setExpenses(prevRef.current);
         setError("Failed to create expense");
         return false;
       }
     },
-    [load],
+    [load, expenses],
   );
 
   const update = useCallback(
     async (id: number, data: ExpenseUpdate, filters?: ExpenseFilters) => {
       setError("");
       setSuccess("");
+
+      prevRef.current = expenses;
+      setExpenses((prev) =>
+        prev.map((e) => (e.id === id ? { ...e, ...data } : e)),
+      );
+
       try {
         await apiUpdateExpense(id, data);
         setSuccess("Expense updated successfully");
         await load(filters);
         return true;
       } catch {
+        setExpenses(prevRef.current);
         setError("Failed to update expense");
         return false;
       }
     },
-    [load],
+    [load, expenses],
   );
 
   const remove = useCallback(
     async (id: number, filters?: ExpenseFilters) => {
       setError("");
       setSuccess("");
+
+      prevRef.current = expenses;
+      setExpenses((prev) => prev.filter((e) => e.id !== id));
+
       try {
         await apiDeleteExpense(id);
         setSuccess("Expense deleted successfully");
         await load(filters);
         return true;
       } catch {
+        setExpenses(prevRef.current);
         setError("Failed to delete expense");
         return false;
       }
     },
-    [load],
+    [load, expenses],
   );
 
   const clearSuccess = useCallback(() => setSuccess(""), []);

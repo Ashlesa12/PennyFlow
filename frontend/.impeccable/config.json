@@ -1,0 +1,82 @@
+{
+  "designSystem": {
+    "name": "PennyFlow",
+
+    "theme": "premium-fintech",
+
+    "personality": [
+      "minimal",
+      "calm",
+      "professional",
+      "trustworthy",
+      "premium"
+    ],
+
+    "colors": {
+      "primary": "#10B981",
+      "background": "#F7F5F2",
+      "surface": "#FFFFFF",
+      "text": "#1F2937",
+      "muted": "#6B7280",
+      "border": "#E5E7EB",
+      "danger": "#EF4444"
+    },
+
+    "borderRadius": {
+      "cards": "24px",
+      "buttons": "16px",
+      "inputs": "16px",
+      "modals": "28px"
+    },
+
+    "spacing": {
+      "compact": 8,
+      "normal": 16,
+      "comfortable": 24,
+      "section": 48
+    },
+
+    "shadows": {
+      "style": "soft",
+      "intensity": "subtle"
+    },
+
+    "glassmorphism": {
+      "enabled": true,
+      "blur": "medium",
+      "opacity": "low"
+    },
+
+    "typography": {
+      "style": "modern",
+      "hierarchy": "clear",
+      "avoid": [
+        "oversized headings",
+        "dense paragraphs"
+      ]
+    },
+
+    "animations": {
+      "duration": "200-300ms",
+      "style": "subtle",
+      "avoid": [
+        "bouncy",
+        "flashy",
+        "overly dramatic"
+      ]
+    },
+
+    "rules": [
+      "Keep layouts balanced.",
+      "Avoid excessive whitespace.",
+      "Avoid cramped spacing.",
+      "Maintain consistent card styling.",
+      "Use generous padding.",
+      "Prefer floating surfaces over flat sections.",
+      "Preserve visual hierarchy.",
+      "Design mobile-first.",
+      "Do not introduce random accent colors.",
+      "Maintain PennyFlow branding."
+    ]
+  }
+}

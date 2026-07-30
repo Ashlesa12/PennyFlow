@@ -3,14 +3,14 @@ from datetime import date
 
 from fastapi import APIRouter, Depends, HTTPException, status, Response
 from sqlalchemy.orm import Session
-from sqlalchemy import desc, func
+from sqlalchemy import desc, func, or_
 from app.schemas import (
     ExpenseCreate,
     ExpenseResponse,
     ExpenseUpdate,
     ExpenseSummary,
     CategorySummary,
-    MonthlySummary
+    MonthlySummary,
 )
 
 from app.database import get_db
@@ -51,6 +51,7 @@ def get_expenses(
     max_amount: Optional[float] = None,
     start_date: Optional[date] = None,
     end_date: Optional[date] = None,
+    search: Optional[str] = None,
     sort_by: Optional[str] = None,
     order: str = "desc",
     db: Session = Depends(get_db),
@@ -60,6 +61,15 @@ def get_expenses(
     query = db.query(Expense).filter(
         Expense.user_id == current_user.id
     )
+
+    # Search filter (title + category name)
+    if search:
+        query = query.join(Category).filter(
+            or_(
+                Expense.title.ilike(f"%{search}%"),
+                Category.name.ilike(f"%{search}%"),
+            )
+        )
 
     # Category filter
     if category_id is not None:
@@ -287,3 +297,4 @@ def delete_expense(
     db.commit()
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+

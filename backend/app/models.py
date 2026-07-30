@@ -37,6 +37,8 @@ class Category(Base):
 
     name = Column(String, unique=True, nullable=False)
 
+    icon = Column(String, nullable=True)
+
     expenses = relationship("Expense", back_populates="category")
 
 

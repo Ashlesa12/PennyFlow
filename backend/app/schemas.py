@@ -62,3 +62,11 @@ class CategorySummary(BaseModel):
 class MonthlySummary(BaseModel):
     month: str
     total: float
+
+class CategoryResponse(BaseModel):
+    id: int
+    name: str
+    icon: str | None = None
+
+    class Config:
+        from_attributes = True

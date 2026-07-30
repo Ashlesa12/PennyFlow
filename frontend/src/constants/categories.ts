@@ -10,6 +10,7 @@ import {
   Ellipsis,
 } from "lucide-react";
 import type { Category } from "../types/expense";
+import api from "../api/client";
 
 export const DEFAULT_CATEGORIES: Category[] = [
   { id: 1, name: "Food & Dining", icon: "utensils" },
@@ -32,6 +33,17 @@ const iconMap: Record<number, LucideIcon> = {
   7: Plane,
   8: Ellipsis,
 };
+
+export async function fetchCategories(): Promise<Category[]> {
+  try {
+    const res = await api.get<Category[]>("/categories/");
+    if (Array.isArray(res.data) && res.data.length > 0) {
+      return res.data.map((c) => ({ ...c, icon: c.icon || "ellipsis" }));
+    }
+  } catch {
+  }
+  return DEFAULT_CATEGORIES;
+}
 
 export function getCategoryById(id: number): Category | undefined {
   return DEFAULT_CATEGORIES.find((category) => category.id === id);
