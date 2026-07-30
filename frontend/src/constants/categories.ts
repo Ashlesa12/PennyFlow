@@ -1,9 +1,16 @@
+import type { LucideIcon } from "lucide-react";
+import {
+  Utensils,
+  Car,
+  ShoppingBag,
+  Gamepad2,
+  Receipt,
+  HeartPulse,
+  Plane,
+  Ellipsis,
+} from "lucide-react";
 import type { Category } from "../types/expense";
 
-/**
- * Static fallback categories until GET /categories is available on the backend.
- * Icon values match lucide-react icon names.
- */
 export const DEFAULT_CATEGORIES: Category[] = [
   { id: 1, name: "Food & Dining", icon: "utensils" },
   { id: 2, name: "Transportation", icon: "car" },
@@ -15,10 +22,25 @@ export const DEFAULT_CATEGORIES: Category[] = [
   { id: 8, name: "Other", icon: "ellipsis" },
 ];
 
+const iconMap: Record<number, LucideIcon> = {
+  1: Utensils,
+  2: Car,
+  3: ShoppingBag,
+  4: Gamepad2,
+  5: Receipt,
+  6: HeartPulse,
+  7: Plane,
+  8: Ellipsis,
+};
+
 export function getCategoryById(id: number): Category | undefined {
   return DEFAULT_CATEGORIES.find((category) => category.id === id);
 }
 
 export function getCategoryName(id: number): string {
   return getCategoryById(id)?.name ?? "Unknown";
+}
+
+export function getCategoryIcon(id: number): LucideIcon {
+  return iconMap[id] ?? Ellipsis;
 }
