@@ -5,7 +5,7 @@ export function AnalyticsSkeleton() {
         {Array.from({ length: 5 }).map((_, i) => (
           <div
             key={i}
-            className="relative overflow-hidden rounded-3xl border border-white/40 bg-white/70 p-5 shadow-lg shadow-black/[0.02]"
+            className="relative overflow-hidden rounded-3xl border border-border-strong bg-surface-elevated p-5 shadow-lg shadow-black/[0.02]"
           >
             <div className="mb-4 h-10 w-10 rounded-xl bg-neutral-200/60" />
             <div className="space-y-2">
@@ -24,7 +24,7 @@ export function AnalyticsSkeleton() {
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <div className="relative overflow-hidden rounded-3xl border border-white/40 bg-white/70 p-6 shadow-lg shadow-black/[0.02]">
+        <div className="relative overflow-hidden rounded-3xl border border-border-strong bg-surface-elevated p-6 shadow-lg shadow-black/[0.02]">
           <div className="mb-6 space-y-1.5">
             <div className="h-5 w-40 rounded-full bg-neutral-200/60" />
             <div className="h-3.5 w-56 rounded-full bg-neutral-200/40" />
@@ -50,18 +50,18 @@ export function AnalyticsSkeleton() {
           />
         </div>
 
-        <div className="relative overflow-hidden rounded-3xl border border-white/40 bg-white/70 p-6 shadow-lg shadow-black/[0.02]">
+        <div className="relative overflow-hidden rounded-3xl border border-border-strong bg-surface-elevated p-6 shadow-lg shadow-black/[0.02]">
           <div className="mb-6 space-y-1.5">
             <div className="h-5 w-40 rounded-full bg-neutral-200/60" />
             <div className="h-3.5 w-48 rounded-full bg-neutral-200/40" />
           </div>
           <div className="space-y-4">
             <div className="flex items-end gap-3">
-              {Array.from({ length: 6 }).map((_, j) => (
+              {[60, 95, 55, 80, 105, 70].map((h, j) => (
                 <div
                   key={j}
                   className="flex-1 rounded-t-lg bg-neutral-200/40"
-                  style={{ height: `${40 + Math.random() * 80}px` }}
+                  style={{ height: `${h * 0.6}px` }}
                 />
               ))}
             </div>
@@ -85,7 +85,7 @@ export function AnalyticsSkeleton() {
         {Array.from({ length: 4 }).map((_, i) => (
           <div
             key={i}
-            className="relative overflow-hidden rounded-3xl border border-white/40 bg-white/70 p-5 shadow-lg shadow-black/[0.02]"
+            className="relative overflow-hidden rounded-3xl border border-border-strong bg-surface-elevated p-5 shadow-lg shadow-black/[0.02]"
           >
             <div className="mb-3 h-9 w-9 rounded-xl bg-neutral-200/60" />
             <div className="space-y-2">

@@ -1,5 +1,6 @@
+import { useMemo } from "react";
 import { Search, RotateCcw } from "lucide-react";
-import { Button } from "../ui";
+import { Button, Select, type SelectOption } from "../ui";
 import type { Category } from "../../types";
 
 interface FilterValues {
@@ -18,7 +19,7 @@ interface ExpenseFiltersProps {
   hasActiveFilters: boolean;
 }
 
-const SORT_OPTIONS = [
+const SORT_OPTIONS: SelectOption[] = [
   { value: "date_desc", label: "Newest" },
   { value: "date_asc", label: "Oldest" },
   { value: "amount_desc", label: "Highest Amount" },
@@ -32,6 +33,14 @@ export function ExpenseFilters({
   onReset,
   hasActiveFilters,
 }: ExpenseFiltersProps) {
+  const categoryOptions = useMemo<SelectOption[]>(
+    () => [
+      { value: "", label: "All Categories" },
+      ...categories.map((cat) => ({ value: String(cat.id), label: cat.name })),
+    ],
+    [categories],
+  );
+
   const update = (patch: Partial<FilterValues>) => {
     onChange({ ...values, ...patch });
   };
@@ -45,51 +54,40 @@ export function ExpenseFilters({
           placeholder="Search expenses..."
           value={values.search}
           onChange={(e) => update({ search: e.target.value })}
-          className="h-11 w-full rounded-2xl border border-white/40 bg-white/60 pl-11 pr-4 text-sm text-text-primary backdrop-blur-sm placeholder:text-text-tertiary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/30 focus-visible:border-emerald-500/50"
+          className="h-11 w-full rounded-2xl border border-border-strong bg-surface-muted pl-11 pr-4 text-sm text-text-primary backdrop-blur-sm placeholder:text-text-tertiary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/30 focus-visible:border-emerald-500/50"
         />
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-        <select
+        <Select
           value={values.category_id}
-          onChange={(e) => update({ category_id: e.target.value })}
-          className="h-11 w-full rounded-2xl border border-white/40 bg-white/60 px-4 text-sm text-text-primary backdrop-blur-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/30 focus-visible:border-emerald-500/50 sm:w-auto"
-        >
-          <option value="">All Categories</option>
-          {categories.map((cat) => (
-            <option key={cat.id} value={cat.id}>
-              {cat.name}
-            </option>
-          ))}
-        </select>
+          onChange={(value) => update({ category_id: value })}
+          options={categoryOptions}
+          className="sm:w-auto sm:min-w-[11rem]"
+        />
 
         <div className="flex items-center gap-2 sm:gap-3">
           <input
             type="date"
             value={values.start_date}
             onChange={(e) => update({ start_date: e.target.value })}
-            className="h-11 flex-1 rounded-2xl border border-white/40 bg-white/60 px-4 text-sm text-text-primary backdrop-blur-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/30 focus-visible:border-emerald-500/50 sm:flex-initial"
+            className="h-11 flex-1 rounded-2xl border border-border-strong bg-surface-muted px-4 text-sm text-text-primary backdrop-blur-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/30 focus-visible:border-emerald-500/50 sm:flex-initial"
           />
           <span className="hidden shrink-0 text-sm text-text-tertiary sm:inline">—</span>
           <input
             type="date"
             value={values.end_date}
             onChange={(e) => update({ end_date: e.target.value })}
-            className="h-11 flex-1 rounded-2xl border border-white/40 bg-white/60 px-4 text-sm text-text-primary backdrop-blur-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/30 focus-visible:border-emerald-500/50 sm:flex-initial"
+            className="h-11 flex-1 rounded-2xl border border-border-strong bg-surface-muted px-4 text-sm text-text-primary backdrop-blur-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/30 focus-visible:border-emerald-500/50 sm:flex-initial"
           />
         </div>
 
-        <select
+        <Select
           value={values.sort}
-          onChange={(e) => update({ sort: e.target.value })}
-          className="h-11 w-full rounded-2xl border border-white/40 bg-white/60 px-4 text-sm text-text-primary backdrop-blur-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/30 focus-visible:border-emerald-500/50 sm:w-auto"
-        >
-          {SORT_OPTIONS.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
+          onChange={(value) => update({ sort: value })}
+          options={SORT_OPTIONS}
+          className="sm:w-auto sm:min-w-[11rem]"
+        />
 
         {hasActiveFilters && (
           <Button variant="ghost" size="sm" onClick={onReset}>

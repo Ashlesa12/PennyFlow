@@ -1,4 +1,11 @@
-export type { UserCreate, User, Token, LoginCredentials } from "./auth";
+export type {
+  UserCreate,
+  User,
+  UserPreferences,
+  ChangePassword,
+  Token,
+  LoginCredentials,
+} from "./auth";
 export type {
   ExpenseCreate,
   ExpenseUpdate,
@@ -14,3 +21,9 @@ export type {
   BudgetCreate,
   BudgetUpdate,
 } from "./budget";
+export type {
+  RecurringExpense,
+  RecurringCreate,
+  RecurringUpdate,
+  RecurringFrequency,
+} from "./recurring";

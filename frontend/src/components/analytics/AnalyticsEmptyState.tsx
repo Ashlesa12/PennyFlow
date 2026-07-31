@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 export function AnalyticsEmptyState() {
   return (
-    <div className="flex flex-col items-center justify-center rounded-3xl border-2 border-dashed border-border bg-white/40 px-6 py-24 text-center backdrop-blur-sm">
+    <div className="flex flex-col items-center justify-center rounded-3xl border-2 border-dashed border-border bg-surface-subtle px-6 py-24 text-center backdrop-blur-sm">
       <svg
         width="120"
         height="120"
@@ -29,7 +29,7 @@ export function AnalyticsEmptyState() {
 
       <Link
         to="/expenses"
-        className="mt-6 inline-flex h-10 items-center gap-2 rounded-full bg-accent px-5 text-sm font-medium text-surface shadow-sm shadow-accent/20 transition-all duration-200 hover:opacity-90 active:scale-[0.98]"
+        className="mt-6 inline-flex h-10 items-center gap-2 rounded-full bg-accent px-5 text-sm font-medium text-white shadow-sm shadow-accent/20 transition-all duration-200 hover:opacity-90 active:scale-[0.98]"
       >
         Add Your First Expense
       </Link>

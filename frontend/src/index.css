@@ -7,6 +7,10 @@
 
 @import "tailwindcss";
 
+/* Class-driven dark mode: `.dark` on <html> activates every
+   `dark:` utility as well as the `html.dark` token overrides below. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* ══════════════════════════════════════════════════════════════
    1. THEME TOKENS
    ─────────────────────────────────────────────
@@ -22,9 +26,17 @@
   --color-bg: #F7F6F2;
   --color-surface: #ffffff;
   --color-surface-elevated: rgba(255, 255, 255, 0.65);
+  --color-surface-strong: rgba(255, 255, 255, 0.85);
+  --color-surface-muted: rgba(255, 255, 255, 0.6);
+  --color-surface-soft: rgba(255, 255, 255, 0.5);
+  --color-surface-subtle: rgba(255, 255, 255, 0.4);
+  --color-surface-faint: rgba(255, 255, 255, 0.2);
 
   --color-border: rgba(0, 0, 0, 0.06);
   --color-border-strong: rgba(0, 0, 0, 0.10);
+
+  /* Scrim for modals & mobile overlays. Dark-aware via html.dark. */
+  --color-overlay: rgba(15, 17, 21, 0.28);
 
   --color-text-primary: #1c1b1e;
   --color-text-secondary: #8c8a8b;
@@ -135,6 +147,58 @@
 }
 
 /* ══════════════════════════════════════════════════════════════
+   DARK THEME
+   ─────────────────────────────────────────────
+   Class-driven: add `.dark` to <html> to activate.
+   Re-declares the token CSS variables so every
+   utility that consumes them re-themes automatically.
+   ══════════════════════════════════════════════════════════════ */
+
+html.dark {
+  color-scheme: dark;
+
+  --color-bg: #0f1115;
+  --color-surface: #191c22;
+  --color-surface-elevated: rgba(255, 255, 255, 0.06);
+  --color-surface-strong: rgba(255, 255, 255, 0.09);
+  --color-surface-muted: rgba(255, 255, 255, 0.07);
+  --color-surface-soft: rgba(255, 255, 255, 0.05);
+  --color-surface-subtle: rgba(255, 255, 255, 0.04);
+  --color-surface-faint: rgba(255, 255, 255, 0.03);
+
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-strong: rgba(255, 255, 255, 0.14);
+
+  --color-text-primary: #f3f4f6;
+  --color-text-secondary: #a6abb3;
+  --color-text-tertiary: #8a93a2;
+
+  --color-accent: #34d399;
+  --color-accent-soft: rgba(52, 211, 153, 0.14);
+
+  --color-overlay: rgba(0, 0, 0, 0.55);
+
+  /* Neutral used by skeleton fills + subtle tracks. */
+  --color-neutral-200: #8f969e;
+
+  --pf-glass-border: rgba(255, 255, 255, 0.1);
+  --pf-glass-border-strong: rgba(255, 255, 255, 0.16);
+
+  /* Dark scrollbars: light thumbs on dark tracks. */
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.14);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.22);
+  }
+
+  * {
+    scrollbar-color: rgba(255, 255, 255, 0.14) transparent;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
    2. KEYFRAMES
    ══════════════════════════════════════════════════════════════ */
 
@@ -162,6 +226,17 @@
 @keyframes shimmer {
   0% { transform: translateX(-100%); }
   100% { transform: translateX(100%); }
+}
+
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes toastSlideIn {
@@ -256,7 +331,7 @@
      and surfaces that need more text legibility. */
 
 @utility glass-strong {
-  background: rgba(255, 255, 255, 0.82);
+  background: var(--color-surface-strong);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   border: 1px solid var(--pf-glass-border-strong);
@@ -297,6 +372,13 @@
    ══════════════════════════════════════════════════════════════ */
 
 @layer base {
+  /* ─── Document ────────────────────
+     Native controls (selects, date pickers, scrollbars)
+     follow the active theme instead of defaulting to white. */
+  html {
+    color-scheme: light;
+  }
+
   /* ─── Body ────────────────────── */
   body {
     font-family: var(--font-sans);
@@ -349,4 +431,51 @@
     scrollbar-width: thin;
     scrollbar-color: rgba(0, 0, 0, 0.10) transparent;
   }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   6. THEME TRANSITION
+   ─────────────────────────────────────────────
+   Added to <html> for ~350ms by utils/theme.ts during a
+   theme switch. Cross-fades surfaces, borders and text so
+   Light → Dark (and System-driven OS changes) feel smooth.
+   Skipped entirely when the user prefers reduced motion.
+   ══════════════════════════════════════════════════════════════ */
+
+html.theme-transition,
+html.theme-transition *,
+html.theme-transition *::before,
+html.theme-transition *::after {
+  transition:
+    background-color 300ms var(--pf-ease-out),
+    border-color 300ms var(--pf-ease-out),
+    color 300ms var(--pf-ease-out),
+    fill 300ms var(--pf-ease-out),
+    stroke 300ms var(--pf-ease-out) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.theme-transition,
+  html.theme-transition *,
+  html.theme-transition *::before,
+  html.theme-transition *::after {
+    transition: none !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   7. CHART THEMING
+   ─────────────────────────────────────────────
+   Recharts draws axis ticks and grid lines with inline
+   presentation attributes. Centralizing them here lets the
+   whole chart surface follow the theme tokens. CSS declarations
+   always win over SVG presentation attributes.
+   ══════════════════════════════════════════════════════════════ */
+
+.recharts-cartesian-grid line {
+  stroke: var(--color-border);
+}
+
+.recharts-text {
+  fill: var(--color-text-secondary);
 }

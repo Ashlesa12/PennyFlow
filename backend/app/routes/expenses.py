@@ -3,7 +3,7 @@ from datetime import date
 
 from fastapi import APIRouter, Depends, HTTPException, status, Response
 from sqlalchemy.orm import Session
-from sqlalchemy import desc, func, or_
+from sqlalchemy import desc, func
 from app.schemas import (
     ExpenseCreate,
     ExpenseResponse,
@@ -16,6 +16,7 @@ from app.schemas import (
 from app.database import get_db
 from app.models import Expense, User, Category
 from app.security import get_current_user
+from app.services.expense_filters import apply_expense_filters
 
 router = APIRouter(
     prefix="/expenses",
@@ -62,44 +63,15 @@ def get_expenses(
         Expense.user_id == current_user.id
     )
 
-    # Search filter (title + category name)
-    if search:
-        query = query.join(Category).filter(
-            or_(
-                Expense.title.ilike(f"%{search}%"),
-                Category.name.ilike(f"%{search}%"),
-            )
-        )
-
-    # Category filter
-    if category_id is not None:
-        query = query.filter(
-            Expense.category_id == category_id
-        )
-
-    # Minimum amount
-    if min_amount is not None:
-        query = query.filter(
-            Expense.amount >= min_amount
-        )
-
-    # Maximum amount
-    if max_amount is not None:
-        query = query.filter(
-            Expense.amount <= max_amount
-        )
-
-    # Start date
-    if start_date is not None:
-        query = query.filter(
-            Expense.expense_date >= start_date
-        )
-
-    # End date
-    if end_date is not None:
-        query = query.filter(
-            Expense.expense_date <= end_date
-        )
+    query = apply_expense_filters(
+        query,
+        search=search,
+        category_id=category_id,
+        min_amount=min_amount,
+        max_amount=max_amount,
+        start_date=start_date,
+        end_date=end_date,
+    )
 
     # Sorting
     sortable_columns = {

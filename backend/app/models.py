@@ -26,11 +26,21 @@ class User(Base):
 
     password = Column(String, nullable=False)
 
+    avatar_url = Column(String, nullable=True)
+
+    currency = Column(String, nullable=True)
+
+    date_format = Column(String, nullable=True)
+
+    theme = Column(String, nullable=True)
+
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     expenses = relationship("Expense", back_populates="user")
 
     budgets = relationship("Budget", back_populates="user")
+
+    recurring_expenses = relationship("RecurringExpense", back_populates="user")
 
 
 class Category(Base):
@@ -43,6 +53,8 @@ class Category(Base):
     icon = Column(String, nullable=True)
 
     expenses = relationship("Expense", back_populates="category")
+
+    recurring_expenses = relationship("RecurringExpense", back_populates="category")
 
 
 class Expense(Base):
@@ -90,3 +102,37 @@ class Budget(Base):
     )
 
     user = relationship("User", back_populates="budgets")
+
+
+class RecurringExpense(Base):
+    __tablename__ = "recurring_expenses"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+
+    title = Column(String, nullable=False)
+
+    amount = Column(Numeric(10, 2), nullable=False)
+
+    category_id = Column(Integer, ForeignKey("categories.id"), nullable=False)
+
+    frequency = Column(String, nullable=False)
+
+    start_date = Column(Date, nullable=False)
+
+    next_due_date = Column(Date, nullable=False)
+
+    is_active = Column(Integer, default=1, nullable=False)
+
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    updated_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now()
+    )
+
+    user = relationship("User", back_populates="recurring_expenses")
+
+    category = relationship("Category", back_populates="recurring_expenses")

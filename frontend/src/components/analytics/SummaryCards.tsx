@@ -63,7 +63,7 @@ export function SummaryCards({ summary }: SummaryCardsProps) {
         return (
           <div
             key={item.title}
-            className="flex flex-col gap-3 rounded-3xl border border-white/40 bg-white/70 p-5 shadow-lg shadow-black/[0.02] backdrop-blur-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl"
+            className="flex flex-col gap-3 rounded-3xl border border-border-strong bg-surface-elevated p-5 shadow-lg shadow-black/[0.02] backdrop-blur-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl"
           >
             <div
               className={`flex h-10 w-10 items-center justify-center rounded-xl ${accentStyles[item.accent]}`}

@@ -31,7 +31,7 @@ export function DeleteConfirmationModal({
       title="Delete Expense?"
       description="This action cannot be undone."
     >
-      <p className="text-sm text-neutral-600">
+      <p className="text-sm text-text-secondary">
         Are you sure you want to delete this expense? This will permanently
         remove it from your account.
       </p>

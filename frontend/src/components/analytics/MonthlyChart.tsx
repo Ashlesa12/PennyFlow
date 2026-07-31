@@ -7,7 +7,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import type { TooltipProps } from "recharts";
+import type { TooltipContentProps } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../ui";
 import { formatCurrency } from "../../utils/formatCurrency";
 import type { MonthlySummary } from "../../types";
@@ -21,19 +21,20 @@ function formatMonthLabel(ym: string): string {
   return months[parseInt(m, 10) - 1] || ym;
 }
 
-function ChartTooltip({ active, payload, label }: TooltipProps<number, string>) {
+function ChartTooltip({ active, payload, label }: TooltipContentProps) {
   if (active && payload && payload.length) {
     const months = [
       "January", "February", "March", "April", "May", "June",
       "July", "August", "September", "October", "November", "December",
     ];
-    const [, m] = label.split("-");
-    const monthName = months[parseInt(m, 10) - 1] || label;
+    const labelStr = String(label ?? "");
+    const [, m] = labelStr.split("-");
+    const monthName = months[parseInt(m, 10) - 1] || labelStr;
     return (
-      <div className="rounded-xl border border-white/40 bg-white/80 px-3 py-2 text-sm shadow-lg shadow-black/[0.02] backdrop-blur-xl">
+      <div className="rounded-xl border border-border-strong bg-surface-strong px-3 py-2 text-sm shadow-lg shadow-black/[0.02] backdrop-blur-xl">
         <p className="text-xs text-text-secondary">{monthName}</p>
         <p className="font-semibold text-text-primary">
-          {formatCurrency(payload[0].value ?? 0)}
+          {formatCurrency(Number(payload[0].value ?? 0))}
         </p>
       </div>
     );
@@ -83,27 +84,28 @@ export function MonthlyChart({ data }: MonthlyChartProps) {
             >
               <CartesianGrid
                 strokeDasharray="3 3"
-                stroke="rgba(0,0,0,0.04)"
                 vertical={false}
               />
               <XAxis
                 dataKey="month"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fontSize: 12, fill: "#8c8a8b" }}
+                tick={{ fontSize: 12 }}
               />
               <YAxis
                 axisLine={false}
                 tickLine={false}
-                tick={{ fontSize: 12, fill: "#8c8a8b" }}
+                tick={{ fontSize: 12 }}
                 tickFormatter={(v: number) => `Rs. ${v}`}
               />
-              <Tooltip content={<ChartTooltip />} />
+              <Tooltip content={ChartTooltip} />
               <Bar
                 dataKey="amount"
                 radius={[8, 8, 0, 0]}
                 maxBarSize={48}
                 fill="#10B981"
+                animationDuration={300}
+                activeBar={{ fill: "rgba(16, 185, 129, 0.8)" }}
               />
             </BarChart>
           </ResponsiveContainer>

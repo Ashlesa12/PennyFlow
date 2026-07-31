@@ -2,6 +2,7 @@ import api from "./client";
 import type { Expense, ExpenseCreate, ExpenseUpdate } from "../types";
 
 export interface ExpenseFilters {
+  search?: string;
   category_id?: number;
   min_amount?: number;
   max_amount?: number;
@@ -11,11 +12,12 @@ export interface ExpenseFilters {
   order?: string;
 }
 
-export async function fetchExpenses(
+export function buildExpenseFilterParams(
   filters?: ExpenseFilters,
-): Promise<Expense[]> {
+): Record<string, string | number> {
   const params: Record<string, string | number> = {};
   if (filters) {
+    if (filters.search) params.search = filters.search;
     if (filters.category_id) params.category_id = filters.category_id;
     if (filters.min_amount !== undefined) params.min_amount = filters.min_amount;
     if (filters.max_amount !== undefined) params.max_amount = filters.max_amount;
@@ -24,7 +26,15 @@ export async function fetchExpenses(
     if (filters.sort_by) params.sort_by = filters.sort_by;
     if (filters.order) params.order = filters.order;
   }
-  const res = await api.get<Expense[]>("/expenses/", { params });
+  return params;
+}
+
+export async function fetchExpenses(
+  filters?: ExpenseFilters,
+): Promise<Expense[]> {
+  const res = await api.get<Expense[]>("/expenses/", {
+    params: buildExpenseFilterParams(filters),
+  });
   return res.data;
 }
 

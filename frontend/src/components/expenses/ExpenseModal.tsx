@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Modal, Input, Button } from "../ui";
+import { Modal, Input, Button, Select } from "../ui";
 import { toISODateString } from "../../utils/formatDate";
 import type { Expense, ExpenseCreate, ExpenseUpdate, Category } from "../../types";
 
@@ -130,19 +130,18 @@ export function ExpenseModal({
           <label className="block text-sm font-medium text-text-primary">
             Category
           </label>
-          <select
-            value={"category_id" in form ? (form as ExpenseCreate).category_id : categories[0]?.id ?? 1}
-            onChange={(e) =>
-              update({ category_id: Number(e.target.value) })
+          <Select
+            value={
+              "category_id" in form
+                ? String((form as ExpenseCreate).category_id)
+                : String(categories[0]?.id ?? 1)
             }
-            className="flex h-11 w-full rounded-2xl border border-white/40 bg-white/60 px-4 text-sm text-text-primary backdrop-blur-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/30 focus-visible:border-emerald-500/50"
-          >
-            {categories.map((cat) => (
-              <option key={cat.id} value={cat.id}>
-                {cat.name}
-              </option>
-            ))}
-          </select>
+            onChange={(value) => update({ category_id: Number(value) })}
+            options={categories.map((cat) => ({
+              value: String(cat.id),
+              label: cat.name,
+            }))}
+          />
         </div>
 
         <div className="flex items-center gap-3 pt-2">

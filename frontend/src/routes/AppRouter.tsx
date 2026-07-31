@@ -6,6 +6,8 @@ import DashboardPage from "../pages/DashboardPage";
 import ExpensesPage from "../pages/ExpensesPage";
 import LoginPage from "../pages/LoginPage";
 import NotFoundPage from "../pages/NotFoundPage";
+import RecurringPage from "../pages/RecurringPage";
+import SettingsPage from "../pages/SettingsPage";
 import SignupPage from "../pages/SignupPage";
 import { ProtectedRoute } from "./ProtectedRoute";
 
@@ -32,6 +34,8 @@ export function AppRouter() {
           <Route path="/analytics" element={<AnalyticsPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/expenses" element={<ExpensesPage />} />
+          <Route path="/recurring" element={<RecurringPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
         </Route>
       </Route>
 

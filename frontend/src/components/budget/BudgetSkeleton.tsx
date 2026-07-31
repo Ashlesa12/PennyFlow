@@ -1,6 +1,6 @@
 export function BudgetSkeleton() {
   return (
-    <div className="relative overflow-hidden rounded-3xl border border-white/40 bg-white/70 p-6 shadow-lg shadow-black/[0.02] lg:p-8">
+    <div className="relative overflow-hidden rounded-3xl border border-border-strong bg-surface-elevated p-6 shadow-lg shadow-black/[0.02] lg:p-8">
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-4">
           <div className="h-10 w-10 rounded-xl bg-neutral-200/60" />

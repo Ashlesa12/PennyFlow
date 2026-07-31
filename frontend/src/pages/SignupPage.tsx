@@ -61,7 +61,7 @@ export default function SignupPage() {
     <AuthLayout variant="signup">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-sm rounded-3xl border border-white/40 bg-white/70 p-8 shadow-xl shadow-black/[0.02] backdrop-blur-xl transition-all duration-300 hover:shadow-2xl"
+        className="w-full max-w-sm rounded-3xl border border-border-strong bg-surface-elevated p-8 shadow-xl shadow-black/[0.02] backdrop-blur-xl transition-all duration-300 hover:shadow-2xl"
       >
         {/* Header */}
         <div className="text-center">

@@ -4,7 +4,7 @@ export function ExpenseSkeleton() {
       {Array.from({ length: 5 }).map((_, i) => (
         <div
           key={i}
-          className="relative overflow-hidden rounded-3xl border border-white/40 bg-white/70 p-5 shadow-lg shadow-black/[0.02]"
+          className="relative overflow-hidden rounded-3xl border border-border-strong bg-surface-elevated p-5 shadow-lg shadow-black/[0.02]"
         >
           <div className="relative flex items-center gap-4">
             <div className="h-10 w-10 shrink-0 rounded-xl bg-neutral-200/60" />

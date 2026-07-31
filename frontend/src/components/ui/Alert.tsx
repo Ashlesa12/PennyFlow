@@ -9,7 +9,7 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
   ({ className, variant = "default", children, ...props }, ref) => {
     const variantStyles = {
       default:
-        "bg-white/50 backdrop-blur-sm text-neutral-700 border border-white/40",
+        "bg-surface-soft backdrop-blur-sm text-text-secondary border border-border-strong",
       destructive:
         "bg-red-50/80 backdrop-blur-sm text-red-800 border border-red-200/60",
       success:

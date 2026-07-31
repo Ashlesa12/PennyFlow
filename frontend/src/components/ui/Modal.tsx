@@ -62,7 +62,7 @@ export function Modal({
       className={cn(
         "fixed inset-0 z-50 flex items-center justify-center p-4 transition-all duration-250",
         visible
-          ? "bg-black/[0.04] backdrop-blur-sm"
+          ? "bg-[var(--color-overlay)] backdrop-blur-sm"
           : "bg-transparent backdrop-blur-none",
       )}
     >
@@ -78,7 +78,7 @@ export function Modal({
         aria-modal="true"
         aria-labelledby={title ? "modal-title" : undefined}
         className={cn(
-          "relative z-10 w-full max-w-lg rounded-3xl border border-white/40 bg-white/70 p-6 shadow-xl shadow-black/[0.02] backdrop-blur-xl transition-all duration-250",
+          "relative z-10 w-full max-w-lg rounded-3xl border border-border-strong bg-surface-elevated p-6 shadow-xl shadow-black/[0.02] backdrop-blur-xl transition-all duration-250",
           visible
             ? "scale-100 opacity-100"
             : "scale-95 opacity-0",

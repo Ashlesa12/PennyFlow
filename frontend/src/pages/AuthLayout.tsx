@@ -56,7 +56,7 @@ export function AuthLayout({ children, variant = "login" }: AuthLayoutProps) {
           <div className="relative mt-8 hidden w-full max-w-lg md:block lg:mt-14">
             {isLogin ? (
               /* ── Login illustration: bar chart ── */
-              <div className="rounded-3xl border border-white/50 bg-white/40 p-6 shadow-xl backdrop-blur-sm">
+              <div className="rounded-3xl border border-border-strong bg-surface-subtle p-6 shadow-xl backdrop-blur-sm">
                 <div className="flex h-40 items-end gap-3">
                   {[50, 75, 35, 95, 55, 70, 42].map((h, i) => (
                     <div
@@ -73,7 +73,7 @@ export function AuthLayout({ children, variant = "login" }: AuthLayoutProps) {
                     </div>
                   ))}
                 </div>
-                <div className="mt-5 h-px bg-black/5" />
+                <div className="mt-5 h-px bg-border" />
                 <div className="mt-5 flex items-center justify-between">
                   {[32, 48, 28, 55, 38].map((w, i) => (
                     <div
@@ -86,10 +86,10 @@ export function AuthLayout({ children, variant = "login" }: AuthLayoutProps) {
               </div>
             ) : (
               /* ── Signup illustration: category breakdown ── */
-              <div className="rounded-3xl border border-white/50 bg-white/40 p-6 shadow-xl backdrop-blur-sm">
+              <div className="rounded-3xl border border-border-strong bg-surface-subtle p-6 shadow-xl backdrop-blur-sm">
                 <div className="flex items-center justify-between">
                   <div className="h-2 w-24 rounded-full bg-accent/20" />
-                  <div className="h-2 w-12 rounded-full bg-black/5" />
+                  <div className="h-2 w-12 rounded-full bg-border" />
                 </div>
                 <div className="mt-6 space-y-4">
                   {[
@@ -104,7 +104,7 @@ export function AuthLayout({ children, variant = "login" }: AuthLayoutProps) {
                         <span className="text-text-secondary">{cat.label}</span>
                         <span className="font-medium text-text-primary">{cat.pct}%</span>
                       </div>
-                      <div className="h-2 rounded-full bg-black/5">
+                      <div className="h-2 rounded-full bg-border">
                         <div
                           className={`h-full rounded-full ${cat.color}/30`}
                           style={{ width: `${cat.pct}%` }}
@@ -117,7 +117,7 @@ export function AuthLayout({ children, variant = "login" }: AuthLayoutProps) {
             )}
 
             {/* Floating mini-card 1 */}
-            <div className="absolute -bottom-4 -right-4 rounded-2xl border border-white/50 bg-white/80 px-5 py-4 shadow-lg backdrop-blur-sm">
+            <div className="absolute -bottom-4 -right-4 rounded-2xl border border-border-strong bg-surface-strong px-5 py-4 shadow-lg backdrop-blur-sm">
               <p className="text-xs font-medium text-text-secondary">
                 {isLogin ? "Total Expenses" : "Categories"}
               </p>
@@ -133,7 +133,7 @@ export function AuthLayout({ children, variant = "login" }: AuthLayoutProps) {
             </div>
 
             {/* Floating mini-card 2 */}
-            <div className="absolute -left-3 -top-3 rounded-xl border border-white/50 bg-white/80 px-4 py-3 shadow-lg backdrop-blur-sm">
+            <div className="absolute -left-3 -top-3 rounded-xl border border-border-strong bg-surface-strong px-4 py-3 shadow-lg backdrop-blur-sm">
               <div className="flex items-center gap-2">
                 <div className="h-2 w-2 rounded-full bg-accent/30" />
                 <span className="text-xs font-medium text-text-secondary">

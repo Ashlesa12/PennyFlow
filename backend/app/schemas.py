@@ -1,7 +1,7 @@
-from pydantic import BaseModel, EmailStr
-from datetime import date
+from pydantic import BaseModel, EmailStr, Field
+from datetime import date, datetime
 from decimal import Decimal
-from typing import Optional
+from typing import Literal, Optional
 
 class UserCreate(BaseModel):
     name: str
@@ -16,6 +16,35 @@ class UserResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class UserUpdate(BaseModel):
+    name: Optional[str] = None
+    avatar_url: Optional[str] = None
+
+
+Currency = Literal["NPR", "USD", "EUR", "GBP", "INR"]
+DateFormat = Literal["YYYY-MM-DD", "DD-MM-YYYY", "MM/DD/YYYY", "DD/MM/YYYY"]
+Theme = Literal["Light", "Dark", "System"]
+
+
+class UserPreferences(BaseModel):
+    currency: Currency
+    date_format: DateFormat
+    theme: Theme
+
+
+class ChangePassword(BaseModel):
+    current_password: str
+    new_password: str
+    confirm_new_password: str
+
+
+class UserProfileResponse(UserResponse):
+    avatar_url: Optional[str] = None
+    currency: str = "NPR"
+    date_format: str = "YYYY-MM-DD"
+    theme: str = "Light"
 
 
 class Token(BaseModel):
@@ -88,6 +117,43 @@ class BudgetResponse(BaseModel):
     spent: float
     remaining: float
     percentage: float
+
+    class Config:
+        from_attributes = True
+
+
+RecurringFrequency = Literal["Daily", "Weekly", "Monthly", "Yearly"]
+
+
+class RecurringExpenseCreate(BaseModel):
+    title: str
+    amount: Decimal = Field(gt=0)
+    category_id: int
+    frequency: RecurringFrequency
+    start_date: date
+    next_due_date: Optional[date] = None
+
+
+class RecurringExpenseUpdate(BaseModel):
+    title: Optional[str] = None
+    amount: Optional[Decimal] = Field(default=None, gt=0)
+    category_id: Optional[int] = None
+    frequency: Optional[RecurringFrequency] = None
+    start_date: Optional[date] = None
+    next_due_date: Optional[date] = None
+
+
+class RecurringExpenseResponse(BaseModel):
+    id: int
+    title: str
+    amount: Decimal
+    category_id: int
+    frequency: str
+    start_date: date
+    next_due_date: date
+    is_active: bool
+    created_at: datetime
+    updated_at: datetime
 
     class Config:
         from_attributes = True

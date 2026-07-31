@@ -47,7 +47,7 @@ export default function LoginPage() {
     <AuthLayout>
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-sm rounded-3xl border border-white/40 bg-white/70 p-8 shadow-xl shadow-black/[0.02] backdrop-blur-xl transition-all duration-300 hover:shadow-2xl"
+        className="w-full max-w-sm rounded-3xl border border-border-strong bg-surface-elevated p-8 shadow-xl shadow-black/[0.02] backdrop-blur-xl transition-all duration-300 hover:shadow-2xl"
       >
         {/* Header */}
         <div className="text-center">
@@ -90,7 +90,7 @@ export default function LoginPage() {
             <label className="flex cursor-pointer items-center gap-2">
               <input
                 type="checkbox"
-                className="h-4 w-4 rounded border-white/40 bg-white/60 text-accent accent-accent focus:ring-accent/30"
+                className="h-4 w-4 rounded border-border-strong bg-surface-muted text-accent accent-accent focus:ring-accent/30"
               />
               <span className="text-sm text-text-secondary">Remember me</span>
             </label>

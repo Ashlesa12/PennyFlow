@@ -15,7 +15,7 @@ export function ExpenseCard({ expense, onEdit, onDelete }: ExpenseCardProps) {
   const Icon = getCategoryIcon(expense.category_id);
 
   return (
-    <div className="group relative rounded-3xl border border-white/40 bg-white/70 p-5 shadow-lg shadow-black/[0.02] backdrop-blur-xl transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-xl hover:shadow-black/[0.04]">
+    <div className="group relative rounded-3xl border border-border-strong bg-surface-elevated p-5 shadow-lg shadow-black/[0.02] backdrop-blur-xl transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-xl hover:shadow-black/[0.04]">
       <div className="pointer-events-none absolute inset-0 rounded-3xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
         style={{
           background:

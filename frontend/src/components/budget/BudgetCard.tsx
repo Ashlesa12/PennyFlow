@@ -149,7 +149,7 @@ export function BudgetCard() {
           <p className="text-xs text-text-tertiary">{statusDetail}</p>
         </div>
 
-        <div className="mt-8 grid grid-cols-3 gap-4 border-t border-white/40 pt-6">
+        <div className="mt-8 grid grid-cols-3 gap-4 border-t border-border-strong pt-6">
           <div>
             <p className="text-xs font-medium text-text-secondary">Spent</p>
             <p className="mt-1 text-lg font-semibold tracking-tight text-text-primary">

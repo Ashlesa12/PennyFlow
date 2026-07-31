@@ -1,13 +1,16 @@
-import { useState, useEffect, useCallback } from "react";
-import { Plus } from "lucide-react";
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { Download, Plus } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
 import { Button, Modal, Toast } from "../components/ui";
 import { ExpenseCard } from "../components/expenses/ExpenseCard";
 import { ExpenseForm } from "../components/expenses/ExpenseForm";
 import { ExpenseFilters } from "../components/expenses/ExpenseFilters";
 import { ExpenseSkeleton } from "../components/expenses/ExpenseSkeleton";
 import { EmptyState } from "../components/expenses/EmptyState";
+import { ExportModal } from "../components/export/ExportModal";
 import { useExpenses } from "../hooks/useExpenses";
 import { useCategories } from "../hooks/useCategories";
+import type { ExpenseFilters as ApiExpenseFilters } from "../api/expenses";
 import type { Expense, ExpenseCreate, ExpenseUpdate } from "../types";
 
 const DEFAULT_FILTERS = {
@@ -21,11 +24,34 @@ const DEFAULT_FILTERS = {
 export default function ExpensesPage() {
   const { expenses, isLoading, error, success, load, create, update, remove, clearSuccess, clearError } = useExpenses();
   const { categories, refetch: refetchCategories } = useCategories();
+  const [searchParams] = useSearchParams();
+  const queryParam = searchParams.get("q") ?? "";
 
-  const [filters, setFilters] = useState(DEFAULT_FILTERS);
+  const [filters, setFilters] = useState(() => ({
+    ...DEFAULT_FILTERS,
+    search: queryParam,
+  }));
+  const [prevQuery, setPrevQuery] = useState(queryParam);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [isExportOpen, setIsExportOpen] = useState(false);
+  const [exportToast, setExportToast] = useState<{
+    message: string;
+    type: "success" | "error";
+  } | null>(null);
+
+  const notifyExport = useCallback(
+    (message: string, type: "success" | "error") =>
+      setExportToast({ message, type }),
+    [],
+  );
+  const dismissExportToast = useCallback(() => setExportToast(null), []);
+
+  if (prevQuery !== queryParam) {
+    setPrevQuery(queryParam);
+    setFilters((prev) => ({ ...prev, search: queryParam }));
+  }
 
   useEffect(() => {
     load();
@@ -68,22 +94,35 @@ export default function ExpensesPage() {
     sortMap[filters.sort] ?? sortMap.date_desc,
   );
 
+  const apiFilters: ApiExpenseFilters = useMemo(() => {
+    const [sort_by, order] = filters.sort.split("_");
+    return {
+      category_id: filters.category_id
+        ? Number(filters.category_id)
+        : undefined,
+      start_date: filters.start_date || undefined,
+      end_date: filters.end_date || undefined,
+      sort_by,
+      order: order === "asc" ? "asc" : "desc",
+    };
+  }, [filters]);
+
   const handleAdd = useCallback(async (data: ExpenseCreate) => {
-    const ok = await create(data, filters);
+    const ok = await create(data, apiFilters);
     if (ok) setIsFormOpen(false);
-  }, [create, filters]);
+  }, [create, apiFilters]);
 
   const handleEdit = useCallback(async (data: ExpenseUpdate) => {
     if (!editingExpense) return;
-    const ok = await update(editingExpense.id, data, filters);
+    const ok = await update(editingExpense.id, data, apiFilters);
     if (ok) setEditingExpense(null);
-  }, [update, editingExpense, filters]);
+  }, [update, editingExpense, apiFilters]);
 
   const handleDelete = useCallback(async () => {
     if (deletingId === null) return;
-    await remove(deletingId, filters);
+    await remove(deletingId, apiFilters);
     setDeletingId(null);
-  }, [remove, deletingId, filters]);
+  }, [remove, deletingId, apiFilters]);
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-8 px-4 py-8 sm:px-6 lg:px-8">
@@ -98,10 +137,19 @@ export default function ExpensesPage() {
             </p>
           </div>
 
-          <Button onClick={() => setIsFormOpen(true)}>
-            <Plus className="h-4 w-4" />
-            Add Expense
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button
+              variant="secondary"
+              onClick={() => setIsExportOpen(true)}
+            >
+              <Download className="h-4 w-4" />
+              Export
+            </Button>
+            <Button onClick={() => setIsFormOpen(true)}>
+              <Plus className="h-4 w-4" />
+              Add Expense
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -154,6 +202,7 @@ export default function ExpensesPage() {
       >
         {editingExpense && (
           <ExpenseForm
+            key={editingExpense.id}
             categories={categories}
             initialData={{
               title: editingExpense.title,
@@ -183,6 +232,12 @@ export default function ExpensesPage() {
         </div>
       </Modal>
 
+      <ExportModal
+        open={isExportOpen}
+        onClose={() => setIsExportOpen(false)}
+        notify={notifyExport}
+      />
+
       <Toast
         message={success}
         type="success"
@@ -194,6 +249,12 @@ export default function ExpensesPage() {
         type="error"
         visible={error !== ""}
         onDismiss={clearError}
+      />
+      <Toast
+        message={exportToast?.message ?? ""}
+        type={exportToast?.type ?? "success"}
+        visible={exportToast !== null}
+        onDismiss={dismissExportToast}
       />
     </div>
   );

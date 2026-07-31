@@ -7,7 +7,7 @@ interface EmptyStateProps {
 
 export function EmptyState({ hasFilters, onAdd }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-3xl border-2 border-dashed border-border bg-white/40 px-6 py-20 text-center backdrop-blur-sm">
+    <div className="flex flex-col items-center justify-center rounded-3xl border-2 border-dashed border-border bg-surface-subtle px-6 py-20 text-center backdrop-blur-sm">
       <svg
         width="120"
         height="120"

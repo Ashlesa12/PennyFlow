@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
-import { Button, Input } from "../ui";
+import { useState } from "react";
+import { Button, Input, Select } from "../ui";
 import { toISODateString } from "../../utils/formatDate";
-import type { ExpenseCreate, ExpenseUpdate, Category } from "../../types";
+import type { ExpenseCreate, Category } from "../../types";
 
 interface ExpenseFormProps {
   categories: Category[];
-  onSubmit: (data: ExpenseCreate | ExpenseUpdate) => Promise<void>;
+  onSubmit: (data: ExpenseCreate) => Promise<void>;
   onCancel: () => void;
   initialData?: {
     title: string;
@@ -31,15 +31,6 @@ export function ExpenseForm({
   );
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
-
-  useEffect(() => {
-    if (initialData) {
-      setTitle(initialData.title);
-      setAmount(initialData.amount);
-      setExpenseDate(initialData.expense_date);
-      setCategoryId(initialData.category_id);
-    }
-  }, [initialData]);
 
   const handleSubmit = async () => {
     if (!title.trim()) {
@@ -104,17 +95,14 @@ export function ExpenseForm({
         <label className="block text-sm font-medium text-text-primary">
           Category
         </label>
-        <select
-          value={categoryId}
-          onChange={(e) => setCategoryId(Number(e.target.value))}
-          className="flex h-11 w-full rounded-2xl border border-white/40 bg-white/60 px-4 text-sm text-text-primary backdrop-blur-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/30 focus-visible:border-emerald-500/50"
-        >
-          {categories.map((cat) => (
-            <option key={cat.id} value={cat.id}>
-              {cat.name}
-            </option>
-          ))}
-        </select>
+        <Select
+          value={String(categoryId)}
+          onChange={(value) => setCategoryId(Number(value))}
+          options={categories.map((cat) => ({
+            value: String(cat.id),
+            label: cat.name,
+          }))}
+        />
       </div>
 
       <div className="flex items-center gap-3 pt-2">

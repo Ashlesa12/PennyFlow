@@ -3,11 +3,11 @@ import { cn } from "../../utils/cn";
 
 const variants = {
   default:
-    "bg-white/70 backdrop-blur-xl border border-white/40 text-neutral-900 shadow-lg shadow-black/[0.02]",
+    "bg-surface-elevated backdrop-blur-xl border border-border-strong text-text-primary shadow-lg shadow-black/[0.02]",
   dark:
     "bg-neutral-900/80 backdrop-blur-xl border border-neutral-700/50 text-white shadow-lg shadow-black/10",
   dashed:
-    "bg-white/40 backdrop-blur-sm border-2 border-dashed border-neutral-200/60 text-neutral-500",
+    "bg-surface-subtle backdrop-blur-sm border-2 border-dashed border-border text-text-tertiary",
 } as const;
 
 export interface CardProps extends HTMLAttributes<HTMLDivElement> {
@@ -52,7 +52,7 @@ export function CardDescription({
   ...props
 }: HTMLAttributes<HTMLParagraphElement>) {
   return (
-    <p className={cn("text-sm text-neutral-500", className)} {...props} />
+    <p className={cn("text-sm text-text-secondary", className)} {...props} />
   );
 }
 
