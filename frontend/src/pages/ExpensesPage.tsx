@@ -20,7 +20,7 @@ const DEFAULT_FILTERS = {
 
 export default function ExpensesPage() {
   const { expenses, isLoading, error, success, load, create, update, remove, clearSuccess, clearError } = useExpenses();
-  const { categories } = useCategories();
+  const { categories, refetch: refetchCategories } = useCategories();
 
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -29,7 +29,8 @@ export default function ExpensesPage() {
 
   useEffect(() => {
     load();
-  }, [load]);
+    refetchCategories();
+  }, [load, refetchCategories]);
 
   const hasActiveFilters =
     filters.search !== "" ||

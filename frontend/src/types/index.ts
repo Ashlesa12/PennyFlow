@@ -8,3 +8,9 @@ export type {
   MonthlySummary,
   Category,
 } from "./expense";
+export type {
+  Budget,
+  BudgetProgress,
+  BudgetCreate,
+  BudgetUpdate,
+} from "./budget";

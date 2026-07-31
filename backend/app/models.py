@@ -5,7 +5,8 @@ from sqlalchemy import (
     Numeric,
     ForeignKey,
     Date,
-    DateTime
+    DateTime,
+    UniqueConstraint
 )
 
 from sqlalchemy.orm import relationship
@@ -28,6 +29,8 @@ class User(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     expenses = relationship("Expense", back_populates="user")
+
+    budgets = relationship("Budget", back_populates="user")
 
 
 class Category(Base):
@@ -62,3 +65,28 @@ class Expense(Base):
     user = relationship("User", back_populates="expenses")
 
     category = relationship("Category", back_populates="expenses")
+
+
+class Budget(Base):
+    __tablename__ = "budgets"
+    __table_args__ = (
+        UniqueConstraint("user_id", "month", name="uq_budget_user_month"),
+    )
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+
+    month = Column(String(7), nullable=False)
+
+    amount = Column(Numeric(10, 2), nullable=False)
+
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    updated_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now()
+    )
+
+    user = relationship("User", back_populates="budgets")

@@ -25,6 +25,7 @@ import {
 } from "recharts";
 import type { TooltipProps } from "recharts";
 import { api } from "../api/client";
+import { BudgetCard } from "../components/budget/BudgetCard";
 import { formatCurrency } from "../utils/formatCurrency";
 import { getCategoryName } from "../constants/categories";
 import {
@@ -399,11 +400,6 @@ function QuickActionsGrid({ actions }: { actions: QuickAction[] }) {
 
 /* ─── Page ──────────────────────────────────────── */
 
-interface MonthlySummary {
-  month: string;
-  total: number;
-}
-
 export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null);
   const [summary, setSummary] = useState<ExpenseSummary | null>(null);
@@ -549,10 +545,13 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      {/* ── 2. Financial Overview ──────────────── */}
+      {/* ── 2. Budget Goal ─────────────────────── */}
+      <BudgetCard />
+
+      {/* ── 3. Financial Overview ──────────────── */}
       <OverviewGrid items={overviewItems} />
 
-      {/* ── 3. Spending Analytics ───────────────── */}
+      {/* ── 4. Spending Analytics ───────────────── */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <WeeklyChart data={weeklyData} />
@@ -560,7 +559,7 @@ export default function DashboardPage() {
         <CategoryDonut data={categoryData} />
       </div>
 
-      {/* ── 4. Recent Expenses ──────────────────── */}
+      {/* ── 5. Recent Expenses ──────────────────── */}
       {recentExpenses.length > 0 ? (
         <ExpensesTable rows={recentExpenses} />
       ) : (
@@ -577,7 +576,7 @@ export default function DashboardPage() {
         </Card>
       )}
 
-      {/* ── 5. Quick Actions ────────────────────── */}
+      {/* ── 6. Quick Actions ────────────────────── */}
       <QuickActionsGrid actions={quickActions} />
     </div>
   );

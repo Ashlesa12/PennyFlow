@@ -70,3 +70,24 @@ class CategoryResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class BudgetCreate(BaseModel):
+    amount: Decimal
+    month: Optional[str] = None
+
+
+class BudgetUpdate(BaseModel):
+    amount: Decimal
+
+
+class BudgetResponse(BaseModel):
+    id: int
+    month: str
+    amount: Decimal
+    spent: float
+    remaining: float
+    percentage: float
+
+    class Config:
+        from_attributes = True

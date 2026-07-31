@@ -46,6 +46,7 @@ PennyFlow is a full-stack personal expense tracker that helps users manage their
 - Dashboard Page with Charts
 - Frontend Setup (React + TypeScript + Tailwind)
 - Indian Rupee (Rs.) currency display
+- Budget Goals (monthly budget, CRUD, progress, warning state)
 
 ### 🚧 In Progress
 - Category Management
@@ -209,6 +210,7 @@ Current authentication flow:
 - [x] Dashboard APIs
 - [x] React Frontend
 - [x] Charts & Analytics
+- [x] Budget Goals
 - [ ] Deployment
 
 ---
