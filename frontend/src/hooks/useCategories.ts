@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef } from "react";
 import api from "../api/client";
+import { DEFAULT_CATEGORIES } from "../constants/categories";
 import type { Category } from "../types";
 
 export function useCategories() {
@@ -15,8 +16,11 @@ export function useCategories() {
     try {
       const res = await api.get<Category[]>("/categories/");
       if (!abortRef.current) {
+        const data = Array.isArray(res.data) ? res.data : [];
         setCategories(
-          Array.isArray(res.data) ? res.data.map((c) => ({ ...c, icon: c.icon || "ellipsis" })) : [],
+          data.length > 0
+            ? data.map((c) => ({ ...c, icon: c.icon || "ellipsis" }))
+            : DEFAULT_CATEGORIES,
         );
       }
     } catch {
