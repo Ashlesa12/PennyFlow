@@ -4,6 +4,7 @@ import { AppLayout } from "../components/layout/AppLayout";
 import AnalyticsPage from "../pages/AnalyticsPage";
 import DashboardPage from "../pages/DashboardPage";
 import ExpensesPage from "../pages/ExpensesPage";
+import IncomePage from "../pages/IncomePage";
 import LoginPage from "../pages/LoginPage";
 import NotFoundPage from "../pages/NotFoundPage";
 import RecurringPage from "../pages/RecurringPage";
@@ -34,6 +35,7 @@ export function AppRouter() {
           <Route path="/analytics" element={<AnalyticsPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/expenses" element={<ExpensesPage />} />
+          <Route path="/income" element={<IncomePage />} />
           <Route path="/recurring" element={<RecurringPage />} />
           <Route path="/settings" element={<SettingsPage />} />
         </Route>

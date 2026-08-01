@@ -3,9 +3,9 @@ import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import {
   TrendingDown,
-  Calendar,
+  TrendingUp,
+  Wallet,
   Receipt,
-  List,
   Plus,
   ArrowUpRight,
   BarChart3,
@@ -28,9 +28,11 @@ import {
 } from "recharts";
 import type { TooltipContentProps, PieSectorDataItem } from "recharts";
 import { api } from "../api/client";
+import { fetchDashboardStats } from "../api/dashboard";
 import { BudgetCard } from "../components/budget/BudgetCard";
 import { UpcomingBillsCard } from "../components/recurring/UpcomingBillsCard";
 import { ExportModal } from "../components/export/ExportModal";
+import { MonthNavigator } from "../components/month/MonthNavigator";
 import { Toast } from "../components/ui";
 import { formatCurrency } from "../utils/formatCurrency";
 import { getCategoryColor, getCategoryName } from "../constants/categories";
@@ -41,9 +43,10 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui";
+import { useMonth } from "../context/MonthContext";
 import type {
-  ExpenseSummary,
   CategorySummary,
+  DashboardStats,
   Expense,
   User,
 } from "../types";
@@ -58,7 +61,7 @@ interface OverviewItem {
   accent: "accent" | "danger";
 }
 
-interface WeeklyPoint {
+interface DailyPoint {
   day: string;
   spend: number;
 }
@@ -79,8 +82,6 @@ interface QuickAction {
   onClick?: () => void;
 }
 
-/* ─── Constants ──────────────────────────────────── */
-
 /* ─── Helpers ───────────────────────────────────── */
 
 function getGreeting(): string {
@@ -88,15 +89,6 @@ function getGreeting(): string {
   if (hour < 12) return "Good Morning";
   if (hour < 17) return "Good Afternoon";
   return "Good Evening";
-}
-
-function formatDate(date: Date): string {
-  return date.toLocaleDateString("en-US", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  });
 }
 
 function formatRelativeDate(date: Date): string {
@@ -109,18 +101,13 @@ function formatRelativeDate(date: Date): string {
   return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
-function isCurrentMonth(date: Date): boolean {
-  const now = new Date();
-  return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
-}
-
 /* ─── Chart Tooltip ─────────────────────────────── */
 
 function ChartTooltip({ active, payload, label }: TooltipContentProps) {
   if (active && payload && payload.length) {
     return (
       <div className="rounded-xl border border-border-strong bg-surface-strong px-3 py-2 text-sm shadow-lg shadow-black/[0.02] backdrop-blur-xl">
-        <p className="text-xs text-text-secondary">{label}</p>
+        <p className="text-xs text-text-secondary">Day {label}</p>
         <p className="font-semibold text-text-primary">
           Rs. {payload[0].value?.toLocaleString()}
         </p>
@@ -166,32 +153,33 @@ function OverviewGrid({ items }: { items: OverviewItem[] }) {
   );
 }
 
-function WeeklyChart({ data }: { data: WeeklyPoint[] }) {
+function DailySpendingChart({ data }: { data: DailyPoint[] }) {
   return (
     <Card className="h-full">
       <CardHeader>
-        <CardTitle>Weekly Spending</CardTitle>
-        <CardDescription>Your spending pattern this week</CardDescription>
+        <CardTitle>Daily Spending</CardTitle>
+        <CardDescription>Your spending pattern this month</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={data} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+            <AreaChart
+              data={data}
+              margin={{ top: 5, right: 5, left: -20, bottom: 0 }}
+            >
               <defs>
                 <linearGradient id="spendGradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#10B981" stopOpacity={0.12} />
                   <stop offset="100%" stopColor="#10B981" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid
-                strokeDasharray="3 3"
-                vertical={false}
-              />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} />
               <XAxis
                 dataKey="day"
                 axisLine={false}
                 tickLine={false}
                 tick={{ fontSize: 12 }}
+                minTickGap={20}
               />
               <YAxis
                 axisLine={false}
@@ -314,14 +302,20 @@ function CategoryDonut({ data }: { data: CategorySlice[] }) {
   );
 }
 
-function ExpensesTable({ rows }: { rows: Expense[] }) {
+function ExpensesTable({
+  rows,
+  description,
+}: {
+  rows: Expense[];
+  description: string;
+}) {
   return (
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
             <CardTitle>Recent Expenses</CardTitle>
-            <CardDescription>Your latest transactions</CardDescription>
+            <CardDescription>{description}</CardDescription>
           </div>
           <Link
             to="/expenses"
@@ -565,8 +559,10 @@ function DashboardSkeleton() {
 /* ─── Page ──────────────────────────────────────── */
 
 export default function DashboardPage() {
+  const { selectedYear, selectedMonthNumber, monthLabel, isCurrentMonth } =
+    useMonth();
   const [user, setUser] = useState<User | null>(null);
-  const [summary, setSummary] = useState<ExpenseSummary | null>(null);
+  const [stats, setStats] = useState<DashboardStats | null>(null);
   const [categorySummary, setCategorySummary] = useState<CategorySummary[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -578,105 +574,115 @@ export default function DashboardPage() {
 
   const quickActions: QuickAction[] = [
     { icon: Plus, label: "Add Expense", to: "/expenses" },
-    { icon: List, label: "View All Expenses", to: "/expenses" },
+    { icon: TrendingUp, label: "Add Income", to: "/income" },
     { icon: BarChart3, label: "View Analytics", to: "/analytics" },
     { icon: Download, label: "Export Expenses", onClick: () => setIsExportOpen(true) },
     { icon: Tags, label: "Manage Categories", disabled: true },
   ];
 
   useEffect(() => {
+    let cancelled = false;
+
     async function fetchData() {
+      setIsLoading(true);
       try {
-        const [userRes, summaryRes, categoryRes, expensesRes] =
+        const [userRes, statsRes, categoryRes, expensesRes] =
           await Promise.all([
             api.get<User>("/auth/me"),
-            api.get<ExpenseSummary>("/expenses/summary"),
-            api.get<CategorySummary[]>("/expenses/category-summary"),
+            fetchDashboardStats(selectedMonthNumber, selectedYear),
+            api.get<CategorySummary[]>("/expenses/category-summary", {
+              params: { month: selectedMonthNumber, year: selectedYear },
+            }),
             api.get<Expense[]>("/expenses/", {
-              params: { sort_by: "date", order: "desc" },
+              params: {
+                month: selectedMonthNumber,
+                year: selectedYear,
+                sort_by: "date",
+                order: "desc",
+              },
             }),
           ]);
 
+        if (cancelled) return;
         setUser(userRes.data);
-        setSummary(summaryRes.data);
+        setStats(statsRes);
         setCategorySummary(categoryRes.data);
         setExpenses(expensesRes.data);
       } catch (err) {
-        console.error("Failed to load dashboard data", err);
+        if (!cancelled) console.error("Failed to load dashboard data", err);
       } finally {
-        setIsLoading(false);
+        if (!cancelled) setIsLoading(false);
       }
     }
 
     fetchData();
-  }, []);
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedMonthNumber, selectedYear]);
 
   const greeting = useMemo(() => getGreeting(), []);
-  const today = useMemo(() => formatDate(new Date()), []);
   const userName = user?.name || "there";
 
   const recentExpenses = useMemo(() => expenses.slice(0, 5), [expenses]);
 
-  const currentMonthExpenses = useMemo(
-    () => expenses.filter((e) => isCurrentMonth(new Date(e.expense_date))),
-    [expenses],
-  );
-
   const overviewItems: OverviewItem[] = useMemo(() => {
-    if (!summary) return [];
+    if (!stats) return [];
 
-    const monthTotal = currentMonthExpenses.reduce(
-      (sum, e) => sum + Number(e.amount),
-      0,
-    );
+    const balancePositive = stats.balance >= 0;
+    const balanceAccent: "accent" | "danger" = balancePositive
+      ? "accent"
+      : "danger";
 
     return [
       {
+        icon: TrendingUp,
+        title: "Total Income",
+        amount: formatCurrency(stats.total_income),
+        subtitle: `${stats.income_count} ${stats.income_count === 1 ? "transaction" : "transactions"}`,
+        accent: "accent" as const,
+      },
+      {
         icon: TrendingDown,
         title: "Total Expenses",
-        amount: formatCurrency(summary.total_amount),
-        subtitle: `${summary.total_expenses} transactions total`,
+        amount: formatCurrency(stats.total_expenses),
+        subtitle: `${stats.expense_count} ${stats.expense_count === 1 ? "transaction" : "transactions"}`,
         accent: "danger" as const,
       },
       {
-        icon: Calendar,
-        title: "This Month",
-        amount: formatCurrency(monthTotal),
-        subtitle: `${currentMonthExpenses.length} transactions so far`,
-        accent: "accent" as const,
+        icon: Wallet,
+        title: "Balance",
+        amount: formatCurrency(stats.balance),
+        subtitle: balancePositive ? "Savings for the month" : "Overspent this month",
+        accent: balanceAccent,
       },
       {
         icon: Receipt,
-        title: "Average Expense",
-        amount: formatCurrency(summary.average_expense),
-        subtitle: `Across ${summary.total_expenses} transactions`,
-        accent: "accent" as const,
-      },
-      {
-        icon: List,
-        title: "Total Transactions",
-        amount: String(summary.total_expenses),
-        subtitle: `${currentMonthExpenses.length} this month`,
+        title: "Transactions",
+        amount: String(stats.income_count + stats.expense_count),
+        subtitle: `${monthLabel}`,
         accent: "accent" as const,
       },
     ];
-  }, [summary, currentMonthExpenses]);
+  }, [stats, monthLabel]);
 
-  const weeklyData: WeeklyPoint[] = useMemo(() => {
-    const now = new Date();
-    return Array.from({ length: 7 }, (_, i) => {
-      const date = new Date(now);
-      date.setDate(date.getDate() - (6 - i));
-      const dayName = date.toLocaleDateString("en-US", { weekday: "short" });
-      const total = expenses
-        .filter((e) => {
-          const d = new Date(e.expense_date);
-          return d.toDateString() === date.toDateString();
-        })
-        .reduce((sum, e) => sum + Number(e.amount), 0);
-      return { day: dayName, spend: total };
+  const dailyData: DailyPoint[] = useMemo(() => {
+    const daysInMonth = new Date(selectedYear, selectedMonthNumber, 0).getDate();
+    const lastDay = isCurrentMonth
+      ? Math.min(daysInMonth, new Date().getDate())
+      : daysInMonth;
+
+    const paddedMonth = String(selectedMonthNumber).padStart(2, "0");
+
+    return Array.from({ length: lastDay }, (_, index) => {
+      const day = index + 1;
+      const dateKey = `${selectedYear}-${paddedMonth}-${String(day).padStart(2, "0")}`;
+      const spend = expenses
+        .filter((expense) => expense.expense_date === dateKey)
+        .reduce((sum, expense) => sum + Number(expense.amount), 0);
+      return { day: String(day), spend };
     });
-  }, [expenses]);
+  }, [expenses, selectedYear, selectedMonthNumber, isCurrentMonth]);
 
   const categoryData: CategorySlice[] = useMemo(() => {
     const total = categorySummary.reduce((sum, c) => sum + c.total, 0);
@@ -706,14 +712,12 @@ export default function DashboardPage() {
             {greeting}, {userName} 👋
           </h1>
           <p className="mt-1 text-sm text-text-secondary">
-            Here&apos;s an overview of your spending.
+            Here&apos;s your overview for {monthLabel}.
           </p>
         </div>
 
-        <div className="flex items-center gap-4">
-          <span className="hidden text-sm text-text-secondary lg:block">
-            {today}
-          </span>
+        <div className="flex flex-wrap items-center gap-4">
+          <MonthNavigator />
           <Link
             to="/expenses"
             className="inline-flex h-10 items-center gap-2 rounded-full bg-accent px-5 text-sm font-medium text-white shadow-sm shadow-accent/20 transition-all duration-200 hover:opacity-90 active:scale-[0.98]"
@@ -733,7 +737,7 @@ export default function DashboardPage() {
       {/* ── 4. Spending Analytics ───────────────── */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <WeeklyChart data={weeklyData} />
+          <DailySpendingChart data={dailyData} />
         </div>
         <CategoryDonut data={categoryData} />
       </div>
@@ -742,7 +746,10 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
           {recentExpenses.length > 0 ? (
-            <ExpensesTable rows={recentExpenses} />
+            <ExpensesTable
+              rows={recentExpenses}
+              description={`Your latest transactions in ${monthLabel}`}
+            />
           ) : (
             <Card>
               <CardHeader>
@@ -751,7 +758,8 @@ export default function DashboardPage() {
               </CardHeader>
               <CardContent>
                 <p className="py-8 text-center text-sm text-text-secondary">
-                  No expenses yet. Add your first expense to get started.
+                  No expenses in {monthLabel}. Add your first expense to get
+                  started.
                 </p>
               </CardContent>
             </Card>

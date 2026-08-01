@@ -2,6 +2,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   Receipt,
+  Wallet,
   BarChart3,
   RefreshCw,
   Tags,
@@ -14,6 +15,7 @@ import { removeAuthToken } from "../../api/client";
 const navItems = [
   { label: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
   { label: "Expenses", path: "/expenses", icon: Receipt },
+  { label: "Income", path: "/income", icon: Wallet },
   { label: "Analytics", path: "/analytics", icon: BarChart3 },
   { label: "Recurring", path: "/recurring", icon: RefreshCw },
   { label: "Categories", path: "/categories", icon: Tags },

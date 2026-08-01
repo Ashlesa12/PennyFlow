@@ -8,6 +8,8 @@ export interface ExpenseFilters {
   max_amount?: number;
   start_date?: string;
   end_date?: string;
+  month?: number;
+  year?: number;
   sort_by?: string;
   order?: string;
 }
@@ -23,6 +25,8 @@ export function buildExpenseFilterParams(
     if (filters.max_amount !== undefined) params.max_amount = filters.max_amount;
     if (filters.start_date) params.start_date = filters.start_date;
     if (filters.end_date) params.end_date = filters.end_date;
+    if (filters.month !== undefined) params.month = filters.month;
+    if (filters.year !== undefined) params.year = filters.year;
     if (filters.sort_by) params.sort_by = filters.sort_by;
     if (filters.order) params.order = filters.order;
   }

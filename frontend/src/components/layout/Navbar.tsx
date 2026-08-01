@@ -9,6 +9,7 @@ interface NavbarProps {
 const routeTitles: Record<string, string> = {
   "/dashboard": "Dashboard",
   "/expenses": "Expenses",
+  "/income": "Income",
   "/analytics": "Analytics",
   "/recurring": "Recurring",
   "/categories": "Categories",
@@ -18,6 +19,7 @@ const routeTitles: Record<string, string> = {
 const routeSubtitles: Record<string, string> = {
   "/dashboard": "Welcome back",
   "/expenses": "Manage your transactions",
+  "/income": "Track your earnings",
   "/analytics": "Spending insights",
   "/recurring": "Subscriptions & bills",
   "/categories": "Organize your spending",

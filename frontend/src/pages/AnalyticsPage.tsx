@@ -5,14 +5,17 @@ import { MonthlyChart } from "../components/analytics/MonthlyChart";
 import { InsightsSection } from "../components/analytics/InsightsSection";
 import { AnalyticsSkeleton } from "../components/analytics/AnalyticsSkeleton";
 import { AnalyticsEmptyState } from "../components/analytics/AnalyticsEmptyState";
+import { MonthNavigator } from "../components/month/MonthNavigator";
 import {
   fetchExpenseSummary,
   fetchCategorySummary,
   fetchMonthlySummary,
 } from "../api/analytics";
+import { useMonth } from "../context/MonthContext";
 import type { ExpenseSummary, CategorySummary, MonthlySummary } from "../types";
 
 export default function AnalyticsPage() {
+  const { selectedMonthNumber, selectedYear, monthLabel } = useMonth();
   const [summary, setSummary] = useState<ExpenseSummary | null>(null);
   const [categorySummary, setCategorySummary] = useState<CategorySummary[]>([]);
   const [monthlySummary, setMonthlySummary] = useState<MonthlySummary[]>([]);
@@ -27,8 +30,8 @@ export default function AnalyticsPage() {
       setError("");
       try {
         const [s, c, m] = await Promise.all([
-          fetchExpenseSummary(),
-          fetchCategorySummary(),
+          fetchExpenseSummary(selectedMonthNumber, selectedYear),
+          fetchCategorySummary(selectedMonthNumber, selectedYear),
           fetchMonthlySummary(),
         ]);
         if (cancelled) return;
@@ -44,7 +47,7 @@ export default function AnalyticsPage() {
 
     load();
     return () => { cancelled = true; };
-  }, []);
+  }, [selectedMonthNumber, selectedYear]);
 
   if (error) {
     return (
@@ -62,7 +65,7 @@ export default function AnalyticsPage() {
     );
   }
 
-  if (!summary || summary.total_expenses === 0) {
+  if (!summary || (summary.total_expenses === 0 && monthlySummary.length === 0)) {
     return (
       <div className="mx-auto max-w-6xl">
         <AnalyticsEmptyState />
@@ -72,6 +75,18 @@ export default function AnalyticsPage() {
 
   return (
     <div className="mx-auto max-w-6xl space-y-8">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-text-primary">
+            Analytics
+          </h1>
+          <p className="mt-1 text-sm text-text-secondary">
+            Insights for {monthLabel}
+          </p>
+        </div>
+        <MonthNavigator />
+      </div>
+
       <SummaryCards summary={summary} />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">

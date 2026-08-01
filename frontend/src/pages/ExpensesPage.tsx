@@ -8,8 +8,10 @@ import { ExpenseFilters } from "../components/expenses/ExpenseFilters";
 import { ExpenseSkeleton } from "../components/expenses/ExpenseSkeleton";
 import { EmptyState } from "../components/expenses/EmptyState";
 import { ExportModal } from "../components/export/ExportModal";
+import { MonthNavigator } from "../components/month/MonthNavigator";
 import { useExpenses } from "../hooks/useExpenses";
 import { useCategories } from "../hooks/useCategories";
+import { useMonth } from "../context/MonthContext";
 import type { ExpenseFilters as ApiExpenseFilters } from "../api/expenses";
 import type { Expense, ExpenseCreate, ExpenseUpdate } from "../types";
 
@@ -24,6 +26,7 @@ const DEFAULT_FILTERS = {
 export default function ExpensesPage() {
   const { expenses, isLoading, error, success, load, create, update, remove, clearSuccess, clearError } = useExpenses();
   const { categories, refetch: refetchCategories } = useCategories();
+  const { selectedMonthNumber, selectedYear, monthLabel } = useMonth();
   const [searchParams] = useSearchParams();
   const queryParam = searchParams.get("q") ?? "";
 
@@ -53,10 +56,25 @@ export default function ExpensesPage() {
     setFilters((prev) => ({ ...prev, search: queryParam }));
   }
 
+  const apiFilters: ApiExpenseFilters = useMemo(() => {
+    const [sort_by, order] = filters.sort.split("_");
+    return {
+      category_id: filters.category_id
+        ? Number(filters.category_id)
+        : undefined,
+      start_date: filters.start_date || undefined,
+      end_date: filters.end_date || undefined,
+      month: selectedMonthNumber,
+      year: selectedYear,
+      sort_by,
+      order: order === "asc" ? "asc" : "desc",
+    };
+  }, [filters, selectedMonthNumber, selectedYear]);
+
   useEffect(() => {
-    load();
+    load(apiFilters);
     refetchCategories();
-  }, [load, refetchCategories]);
+  }, [load, apiFilters, refetchCategories]);
 
   const hasActiveFilters =
     filters.search !== "" ||
@@ -94,19 +112,6 @@ export default function ExpensesPage() {
     sortMap[filters.sort] ?? sortMap.date_desc,
   );
 
-  const apiFilters: ApiExpenseFilters = useMemo(() => {
-    const [sort_by, order] = filters.sort.split("_");
-    return {
-      category_id: filters.category_id
-        ? Number(filters.category_id)
-        : undefined,
-      start_date: filters.start_date || undefined,
-      end_date: filters.end_date || undefined,
-      sort_by,
-      order: order === "asc" ? "asc" : "desc",
-    };
-  }, [filters]);
-
   const handleAdd = useCallback(async (data: ExpenseCreate) => {
     const ok = await create(data, apiFilters);
     if (ok) setIsFormOpen(false);
@@ -127,17 +132,18 @@ export default function ExpensesPage() {
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-8 px-4 py-8 sm:px-6 lg:px-8">
       <div className="flex flex-col items-start gap-6">
-        <div className="flex w-full items-center justify-between">
+        <div className="flex w-full flex-wrap items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-semibold tracking-tight text-text-primary sm:text-3xl">
               Expenses
             </h1>
             <p className="mt-1 text-sm text-text-secondary">
-              Track and manage all your transactions.
+              Track and manage your transactions for {monthLabel}.
             </p>
           </div>
 
           <div className="flex items-center gap-3">
+            <MonthNavigator />
             <Button
               variant="secondary"
               onClick={() => setIsExportOpen(true)}
@@ -167,6 +173,16 @@ export default function ExpensesPage() {
         <EmptyState
           hasFilters={hasActiveFilters}
           onAdd={() => setIsFormOpen(true)}
+          title={
+            hasActiveFilters
+              ? "No matching expenses"
+              : `No expenses in ${monthLabel}`
+          }
+          description={
+            hasActiveFilters
+              ? undefined
+              : "Browse another month or add your first expense to get started."
+          }
         />
       ) : (
         <div className="space-y-3">

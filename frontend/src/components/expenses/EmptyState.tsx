@@ -3,9 +3,18 @@ import { Button } from "../ui";
 interface EmptyStateProps {
   hasFilters?: boolean;
   onAdd: () => void;
+  title?: string;
+  description?: string;
+  actionLabel?: string;
 }
 
-export function EmptyState({ hasFilters, onAdd }: EmptyStateProps) {
+export function EmptyState({
+  hasFilters,
+  onAdd,
+  title,
+  description,
+  actionLabel,
+}: EmptyStateProps) {
   return (
     <div className="flex flex-col items-center justify-center rounded-3xl border-2 border-dashed border-border bg-surface-subtle px-6 py-20 text-center backdrop-blur-sm">
       <svg
@@ -80,18 +89,19 @@ export function EmptyState({ hasFilters, onAdd }: EmptyStateProps) {
       </svg>
 
       <h3 className="text-lg font-semibold tracking-tight text-text-primary">
-        {hasFilters ? "No matching expenses" : "No expenses yet."}
+        {title ?? (hasFilters ? "No matching expenses" : "No expenses yet.")}
       </h3>
 
       <p className="mt-1.5 max-w-xs text-sm text-text-secondary">
-        {hasFilters
-          ? "Try adjusting your filters to find what you're looking for."
-          : "Start tracking today and build better financial habits."}
+        {description ??
+          (hasFilters
+            ? "Try adjusting your filters to find what you're looking for."
+            : "Start tracking today and build better financial habits.")}
       </p>
 
       {!hasFilters && (
         <Button className="mt-6" onClick={onAdd}>
-          Add First Expense
+          {actionLabel ?? "Add First Expense"}
         </Button>
       )}
     </div>

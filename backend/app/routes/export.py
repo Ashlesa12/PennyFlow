@@ -39,6 +39,8 @@ def _fetch_expenses(
     max_amount: Optional[float],
     start_date: Optional[date],
     end_date: Optional[date],
+    month: Optional[int] = None,
+    year: Optional[int] = None,
 ):
 
     query = db.query(Expense).filter(
@@ -53,6 +55,8 @@ def _fetch_expenses(
         max_amount=max_amount,
         start_date=start_date,
         end_date=end_date,
+        month=month,
+        year=year,
     )
 
     return query.options(joinedload(Expense.category)).order_by(
@@ -125,6 +129,8 @@ def export_expenses_csv(
     max_amount: Optional[float] = None,
     start_date: Optional[date] = None,
     end_date: Optional[date] = None,
+    month: Optional[int] = None,
+    year: Optional[int] = None,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
@@ -138,6 +144,8 @@ def export_expenses_csv(
         max_amount=max_amount,
         start_date=start_date,
         end_date=end_date,
+        month=month,
+        year=year,
     )
 
     return Response(
@@ -157,6 +165,8 @@ def export_expenses_xlsx(
     max_amount: Optional[float] = None,
     start_date: Optional[date] = None,
     end_date: Optional[date] = None,
+    month: Optional[int] = None,
+    year: Optional[int] = None,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
@@ -170,6 +180,8 @@ def export_expenses_xlsx(
         max_amount=max_amount,
         start_date=start_date,
         end_date=end_date,
+        month=month,
+        year=year,
     )
 
     return Response(

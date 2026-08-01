@@ -5,28 +5,21 @@ import { BudgetModal } from "./BudgetModal";
 import { BudgetSkeleton } from "./BudgetSkeleton";
 import { useBudget } from "../../hooks/useBudget";
 import { formatCurrency } from "../../utils/formatCurrency";
-import { currentMonth } from "../../api/budgets";
+import { useMonth } from "../../context/MonthContext";
+import { monthLabelFor } from "../../utils/month";
 import { cn } from "../../utils/cn";
-
-const MONTH_LABEL = new Intl.DateTimeFormat(undefined, {
-  month: "long",
-  year: "numeric",
-});
-
-function monthLabel(month: string): string {
-  const year = Number(month.slice(0, 4));
-  const monthIndex = Number(month.slice(5, 7)) - 1;
-  return MONTH_LABEL.format(new Date(year, monthIndex, 1));
-}
 
 export function BudgetCard() {
   const { budget, isLoading, error, success, load, save, clearSuccess, clearError } =
     useBudget();
+  const { selectedMonth } = useMonth();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const budgetMonthLabel = budget ? monthLabelFor(budget.month) : monthLabelFor(selectedMonth);
+
   useEffect(() => {
-    load();
-  }, [load]);
+    load(selectedMonth);
+  }, [load, selectedMonth]);
 
   if (isLoading) {
     return <BudgetSkeleton />;
@@ -44,7 +37,7 @@ export function BudgetCard() {
               <div>
                 <p className="text-sm font-medium text-text-primary">Monthly Budget</p>
                 <p className="mt-1 text-sm leading-relaxed text-text-secondary">
-                  No budget set for {monthLabel(currentMonth())} yet. Set a goal to
+                  No budget set for {budgetMonthLabel} yet. Set a goal to
                   keep your spending on track.
                 </p>
               </div>
@@ -59,7 +52,7 @@ export function BudgetCard() {
         <BudgetModal
           open={isModalOpen}
           onClose={() => setIsModalOpen(false)}
-          month={currentMonth()}
+          month={selectedMonth}
           onSubmit={save}
         />
       </>
@@ -98,7 +91,7 @@ export function BudgetCard() {
       : "You're on track";
 
   const statusDetail = isOver
-    ? `Budget used up for ${monthLabel(budget.month)}`
+    ? `Budget used up for ${budgetMonthLabel}`
     : `${formatCurrency(budget.remaining)} left this month`;
 
   return (
@@ -111,7 +104,7 @@ export function BudgetCard() {
             </div>
             <div>
               <p className="text-sm font-medium text-text-primary">Monthly Budget</p>
-              <p className="text-xs text-text-tertiary">{monthLabel(budget.month)}</p>
+              <p className="text-xs text-text-tertiary">{budgetMonthLabel}</p>
             </div>
           </div>
           <Button

@@ -101,6 +101,37 @@ class CategoryResponse(BaseModel):
         from_attributes = True
 
 
+class IncomeCreate(BaseModel):
+    title: str
+    amount: Decimal
+    income_date: date
+
+
+class IncomeUpdate(BaseModel):
+    title: Optional[str] = None
+    amount: Optional[Decimal] = None
+    income_date: Optional[date] = None
+
+
+class IncomeResponse(BaseModel):
+    id: int
+    title: str
+    amount: Decimal
+    income_date: date
+    user_id: int
+
+    class Config:
+        from_attributes = True
+
+
+class IncomeSummary(BaseModel):
+    total_incomes: int
+    total_amount: float
+    average_income: float
+    highest_income: float
+    lowest_income: float
+
+
 class BudgetCreate(BaseModel):
     amount: Decimal
     month: Optional[str] = None

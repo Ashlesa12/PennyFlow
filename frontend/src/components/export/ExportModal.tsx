@@ -9,6 +9,7 @@ import {
 import { cn } from "../../utils/cn";
 import { Button, Modal, Select, type SelectOption } from "../ui";
 import { useCategories } from "../../hooks/useCategories";
+import { useMonth } from "../../context/MonthContext";
 import { fetchExpenses, type ExpenseFilters } from "../../api/expenses";
 import { downloadExport, exportExpenses, type ExportFormat } from "../../api/export";
 
@@ -27,6 +28,7 @@ const FORMATS: { value: ExportFormat; label: string; icon: typeof FileText }[] =
 
 export function ExportModal({ open, onClose, notify }: ExportModalProps) {
   const { categories, refetch: refetchCategories } = useCategories();
+  const { selectedMonthNumber, selectedYear, monthLabel } = useMonth();
   const [format, setFormat] = useState<ExportFormat>("csv");
   const [search, setSearch] = useState("");
   const [categoryId, setCategoryId] = useState("");
@@ -72,10 +74,12 @@ export function ExportModal({ open, onClose, notify }: ExportModalProps) {
       category_id: categoryId ? Number(categoryId) : undefined,
       start_date: startDate || undefined,
       end_date: endDate || undefined,
+      month: selectedMonthNumber,
+      year: selectedYear,
       min_amount: minAmount !== "" ? Number(minAmount) : undefined,
       max_amount: maxAmount !== "" ? Number(maxAmount) : undefined,
     }),
-    [search, categoryId, startDate, endDate, minAmount, maxAmount],
+    [search, categoryId, startDate, endDate, selectedMonthNumber, selectedYear, minAmount, maxAmount],
   );
 
   useEffect(() => {
@@ -119,6 +123,15 @@ export function ExportModal({ open, onClose, notify }: ExportModalProps) {
       description="Download your expenses as a CSV or Excel file."
     >
       <div className="space-y-5">
+        <div className="flex items-center justify-between rounded-2xl border border-border-strong bg-surface-soft px-4 py-3">
+          <span className="text-sm text-text-secondary">
+            Exporting expenses for
+          </span>
+          <span className="text-sm font-semibold text-text-primary">
+            {monthLabel}
+          </span>
+        </div>
+
         <div className="grid grid-cols-2 gap-1 rounded-2xl border border-border-strong bg-surface-soft p-1">
           {FORMATS.map((opt) => {
             const Icon = opt.icon;

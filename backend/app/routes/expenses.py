@@ -52,6 +52,8 @@ def get_expenses(
     max_amount: Optional[float] = None,
     start_date: Optional[date] = None,
     end_date: Optional[date] = None,
+    month: Optional[int] = None,
+    year: Optional[int] = None,
     search: Optional[str] = None,
     sort_by: Optional[str] = None,
     order: str = "desc",
@@ -71,6 +73,8 @@ def get_expenses(
         max_amount=max_amount,
         start_date=start_date,
         end_date=end_date,
+        month=month,
+        year=year,
     )
 
     # Sorting
@@ -104,6 +108,8 @@ def get_expenses(
 
 @router.get("/summary", response_model=ExpenseSummary)
 def get_expense_summary(
+    month: Optional[int] = None,
+    year: Optional[int] = None,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
@@ -117,8 +123,15 @@ def get_expense_summary(
             func.coalesce(func.min(Expense.amount), 0),
         )
         .filter(Expense.user_id == current_user.id)
-        .first()
     )
+
+    summary = apply_expense_filters(
+        summary,
+        month=month,
+        year=year,
+    )
+
+    summary = summary.first()
 
     return ExpenseSummary(
         total_expenses=summary[0],
@@ -131,6 +144,8 @@ def get_expense_summary(
 
 @router.get("/category-summary", response_model=List[CategorySummary])
 def get_category_summary(
+    month: Optional[int] = None,
+    year: Optional[int] = None,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
@@ -142,6 +157,16 @@ def get_category_summary(
         )
         .join(Category, Expense.category_id == Category.id)
         .filter(Expense.user_id == current_user.id)
+    )
+
+    category_totals = apply_expense_filters(
+        category_totals,
+        month=month,
+        year=year,
+    )
+
+    category_totals = (
+        category_totals
         .group_by(Category.name)
         .order_by(func.sum(Expense.amount).desc())
         .all()

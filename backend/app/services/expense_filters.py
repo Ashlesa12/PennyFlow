@@ -1,7 +1,7 @@
 from datetime import date
 from typing import Optional
 
-from sqlalchemy import or_
+from sqlalchemy import extract, or_
 from sqlalchemy.orm import Query
 
 from app.models import Category, Expense
@@ -15,6 +15,8 @@ def apply_expense_filters(
     max_amount: Optional[float] = None,
     start_date: Optional[date] = None,
     end_date: Optional[date] = None,
+    month: Optional[int] = None,
+    year: Optional[int] = None,
 ) -> Query:
 
     # Search filter (title + category name)
@@ -54,6 +56,17 @@ def apply_expense_filters(
     if end_date is not None:
         query = query.filter(
             Expense.expense_date <= end_date
+        )
+
+    # Month & year (when filtering a specific period)
+    if month is not None:
+        query = query.filter(
+            extract("month", Expense.expense_date) == month
+        )
+
+    if year is not None:
+        query = query.filter(
+            extract("year", Expense.expense_date) == year
         )
 
     return query

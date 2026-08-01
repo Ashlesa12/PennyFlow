@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models import Budget, Expense, RecurringExpense, User
+from app.models import Budget, Expense, Income, RecurringExpense, User
 from app.schemas import (
     ChangePassword,
     UserPreferences,
@@ -116,6 +116,7 @@ def delete_me(
     db: Session = Depends(get_db),
 ):
     db.query(Expense).filter(Expense.user_id == current_user.id).delete()
+    db.query(Income).filter(Income.user_id == current_user.id).delete()
     db.query(Budget).filter(Budget.user_id == current_user.id).delete()
     db.query(RecurringExpense).filter(
         RecurringExpense.user_id == current_user.id

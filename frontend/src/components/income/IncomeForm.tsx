@@ -1,36 +1,30 @@
 import { useState } from "react";
-import { Button, Input, Select } from "../ui";
+import { Button, Input } from "../ui";
 import { useMonth } from "../../context/MonthContext";
 import { defaultDateForMonth } from "../../utils/month";
-import type { ExpenseCreate, Category } from "../../types";
+import type { IncomeCreate } from "../../types";
 
-interface ExpenseFormProps {
-  categories: Category[];
-  onSubmit: (data: ExpenseCreate) => Promise<void>;
+interface IncomeFormProps {
+  onSubmit: (data: IncomeCreate) => Promise<void>;
   onCancel: () => void;
   initialData?: {
     title: string;
     amount: number;
-    expense_date: string;
-    category_id: number;
+    income_date: string;
   };
 }
 
-export function ExpenseForm({
-  categories,
+export function IncomeForm({
   onSubmit,
   onCancel,
   initialData,
-}: ExpenseFormProps) {
+}: IncomeFormProps) {
   const { selectedMonth } = useMonth();
 
   const [title, setTitle] = useState(initialData?.title ?? "");
   const [amount, setAmount] = useState(initialData?.amount ?? 0);
-  const [expenseDate, setExpenseDate] = useState(
-    initialData?.expense_date ?? defaultDateForMonth(selectedMonth),
-  );
-  const [categoryId, setCategoryId] = useState(
-    initialData?.category_id ?? categories[0]?.id ?? 1,
+  const [incomeDate, setIncomeDate] = useState(
+    initialData?.income_date ?? defaultDateForMonth(selectedMonth),
   );
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
@@ -52,8 +46,7 @@ export function ExpenseForm({
       await onSubmit({
         title: title.trim(),
         amount,
-        expense_date: expenseDate,
-        category_id: categoryId,
+        income_date: incomeDate,
       });
     } catch {
       setError("Something went wrong");
@@ -72,7 +65,7 @@ export function ExpenseForm({
 
       <Input
         label="Title"
-        placeholder="e.g. Weekly groceries"
+        placeholder="e.g. Monthly salary"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
       />
@@ -90,30 +83,16 @@ export function ExpenseForm({
       <Input
         label="Date"
         type="date"
-        value={expenseDate}
-        onChange={(e) => setExpenseDate(e.target.value)}
+        value={incomeDate}
+        onChange={(e) => setIncomeDate(e.target.value)}
       />
-
-      <div className="space-y-2">
-        <label className="block text-sm font-medium text-text-primary">
-          Category
-        </label>
-        <Select
-          value={String(categoryId)}
-          onChange={(value) => setCategoryId(Number(value))}
-          options={categories.map((cat) => ({
-            value: String(cat.id),
-            label: cat.name,
-          }))}
-        />
-      </div>
 
       <div className="flex items-center gap-3 pt-2">
         <Button variant="secondary" className="flex-1" onClick={onCancel}>
           Cancel
         </Button>
         <Button className="flex-1" onClick={handleSubmit} isLoading={isSaving}>
-          {initialData ? "Save Changes" : "Add Expense"}
+          {initialData ? "Save Changes" : "Add Income"}
         </Button>
       </div>
     </div>

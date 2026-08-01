@@ -27,3 +27,10 @@ export type {
   RecurringUpdate,
   RecurringFrequency,
 } from "./recurring";
+export type {
+  IncomeCreate,
+  IncomeUpdate,
+  Income,
+  IncomeSummary,
+  DashboardStats,
+} from "./income";

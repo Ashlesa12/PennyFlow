@@ -38,6 +38,8 @@ class User(Base):
 
     expenses = relationship("Expense", back_populates="user")
 
+    incomes = relationship("Income", back_populates="user")
+
     budgets = relationship("Budget", back_populates="user")
 
     recurring_expenses = relationship("RecurringExpense", back_populates="user")
@@ -77,6 +79,24 @@ class Expense(Base):
     user = relationship("User", back_populates="expenses")
 
     category = relationship("Category", back_populates="expenses")
+
+
+class Income(Base):
+    __tablename__ = "incomes"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    title = Column(String, nullable=False)
+
+    amount = Column(Numeric(10, 2), nullable=False)
+
+    income_date = Column(Date, nullable=False)
+
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    user = relationship("User", back_populates="incomes")
 
 
 class Budget(Base):

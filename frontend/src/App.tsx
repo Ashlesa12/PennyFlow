@@ -1,11 +1,14 @@
 import { BrowserRouter } from "react-router-dom";
 import { AppRouter } from "./routes/AppRouter";
+import { MonthProvider } from "./context/MonthContext";
 
 function App() {
   return (
-    <BrowserRouter>
-      <AppRouter />
-    </BrowserRouter>
+    <MonthProvider>
+      <BrowserRouter>
+        <AppRouter />
+      </BrowserRouter>
+    </MonthProvider>
   );
 }
 
