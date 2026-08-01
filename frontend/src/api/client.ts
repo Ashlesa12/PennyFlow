@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Get API base URL from environment variable or fallback to backend default
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://pennyflow.onrender.com';
 
 // Storage keys
 export const TOKEN_KEY = 'pennyflow_auth_token';
