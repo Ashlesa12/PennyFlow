@@ -9,7 +9,12 @@ import {
   CardTitle,
   Select,
 } from "../ui";
-import { applyTheme, resolveTheme, type Theme } from "../../utils/theme";
+import {
+  applyTheme,
+  resolveTheme,
+  type Theme,
+} from "../../utils/theme";
+import { CURRENCIES, setCurrency } from "../../utils/formatCurrency";
 import type { User, UserPreferences } from "../../types";
 
 interface PreferencesSectionProps {
@@ -17,13 +22,9 @@ interface PreferencesSectionProps {
   onSave: (data: UserPreferences) => Promise<boolean>;
 }
 
-const CURRENCY_OPTIONS = [
-  { value: "NPR", label: "Nepalese Rupee", symbol: "Rs." },
-  { value: "USD", label: "US Dollar", symbol: "$" },
-  { value: "EUR", label: "Euro", symbol: "€" },
-  { value: "GBP", label: "British Pound", symbol: "£" },
-  { value: "INR", label: "Indian Rupee", symbol: "₹" },
-] as const;
+const CURRENCY_OPTIONS = (Object.keys(CURRENCIES) as Array<
+  keyof typeof CURRENCIES
+>).map((value) => ({ value, label: CURRENCIES[value].label }));
 
 const DATE_FORMAT_OPTIONS = [
   { value: "YYYY-MM-DD", label: "YYYY-MM-DD" },
@@ -78,14 +79,18 @@ export function PreferencesSection({
   const [isSaving, setIsSaving] = useState(false);
 
   const symbol =
-    CURRENCY_OPTIONS.find((o) => o.value === prefs.currency)?.symbol ?? "Rs.";
+    CURRENCIES[prefs.currency]?.symbol ??
+    CURRENCIES.NPR.symbol;
   const exampleDate = formatDateByPreference(new Date(), prefs.date_format);
 
   const handleSave = async () => {
     setIsSaving(true);
     try {
       const ok = await onSave(prefs);
-      if (ok) applyTheme(prefs.theme);
+      if (ok) {
+        setCurrency(prefs.currency);
+        applyTheme(prefs.theme);
+      }
     } finally {
       setIsSaving(false);
     }

@@ -7,6 +7,7 @@ import {
   Search,
 } from "lucide-react";
 import { cn } from "../../utils/cn";
+import { getCurrencySymbol } from "../../utils/formatCurrency";
 import { Button, Modal, Select, type SelectOption } from "../ui";
 import { useCategories } from "../../hooks/useCategories";
 import { useMonth } from "../../context/MonthContext";
@@ -162,7 +163,7 @@ export function ExportModal({ open, onClose, notify }: ExportModalProps) {
         </div>
 
         <div className="relative">
-          <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-text-tertiary" />
+          <Search className="pointer-events-none absolute left-4 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-text-tertiary" />
           <input
             type="text"
             placeholder="Search expenses..."
@@ -186,7 +187,7 @@ export function ExportModal({ open, onClose, notify }: ExportModalProps) {
 
           <div className="space-y-1.5">
             <label className="text-xs font-medium text-text-secondary">
-              Amount Range (Rs.)
+              Amount Range ({getCurrencySymbol()})
             </label>
             <div className="flex items-center gap-2">
               <input

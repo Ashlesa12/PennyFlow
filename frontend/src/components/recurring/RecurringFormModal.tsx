@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Modal, Button, Input, Select, type SelectOption } from "../ui";
 import { toISODateString } from "../../utils/formatDate";
+import { getCurrencySymbol } from "../../utils/formatCurrency";
 import type { Category, RecurringExpense, RecurringFrequency } from "../../types";
 
 interface RecurringFormModalProps {
@@ -121,7 +122,7 @@ export function RecurringFormModal({
         />
 
         <Input
-          label="Amount (Rs.)"
+          label={`Amount (${getCurrencySymbol()})`}
           type="number"
           min="0"
           step="0.01"

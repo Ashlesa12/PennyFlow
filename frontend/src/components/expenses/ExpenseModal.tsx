@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Modal, Input, Button, Select } from "../ui";
 import { toISODateString } from "../../utils/formatDate";
+import { getCurrencySymbol } from "../../utils/formatCurrency";
 import type { Expense, ExpenseCreate, ExpenseUpdate, Category } from "../../types";
 
 type Mode = "create" | "edit";
@@ -108,7 +109,7 @@ export function ExpenseModal({
         />
 
         <Input
-          label="Amount (Rs.)"
+          label={`Amount (${getCurrencySymbol()})`}
           type="number"
           min="0"
           step="0.01"

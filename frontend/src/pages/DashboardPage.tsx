@@ -35,6 +35,7 @@ import { ExportModal } from "../components/export/ExportModal";
 import { MonthNavigator } from "../components/month/MonthNavigator";
 import { Toast } from "../components/ui";
 import { formatCurrency } from "../utils/formatCurrency";
+import { getCurrencySymbol } from "../utils/formatCurrency";
 import { getCategoryColor, getCategoryName } from "../constants/categories";
 import {
   Card,
@@ -109,7 +110,7 @@ function ChartTooltip({ active, payload, label }: TooltipContentProps) {
       <div className="rounded-xl border border-border-strong bg-surface-strong px-3 py-2 text-sm shadow-lg shadow-black/[0.02] backdrop-blur-xl">
         <p className="text-xs text-text-secondary">Day {label}</p>
         <p className="font-semibold text-text-primary">
-          Rs. {payload[0].value?.toLocaleString()}
+          {getCurrencySymbol()} {payload[0].value?.toLocaleString()}
         </p>
       </div>
     );
@@ -185,7 +186,7 @@ function DailySpendingChart({ data }: { data: DailyPoint[] }) {
                 axisLine={false}
                 tickLine={false}
                 tick={{ fontSize: 12 }}
-                tickFormatter={(v: number) => `Rs. ${v}`}
+                tickFormatter={(v: number) => `${getCurrencySymbol()} ${v}`}
               />
               <Tooltip content={ChartTooltip} />
               <Area

@@ -2,6 +2,7 @@ import { Navigate, Outlet, Route, Routes } from "react-router-dom";
 import { getAuthToken } from "../api/client";
 import { AppLayout } from "../components/layout/AppLayout";
 import AnalyticsPage from "../pages/AnalyticsPage";
+import CategoriesPage from "../pages/CategoriesPage";
 import DashboardPage from "../pages/DashboardPage";
 import ExpensesPage from "../pages/ExpensesPage";
 import IncomePage from "../pages/IncomePage";
@@ -33,6 +34,7 @@ export function AppRouter() {
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout><Outlet /></AppLayout>}>
           <Route path="/analytics" element={<AnalyticsPage />} />
+          <Route path="/categories" element={<CategoriesPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/expenses" element={<ExpensesPage />} />
           <Route path="/income" element={<IncomePage />} />

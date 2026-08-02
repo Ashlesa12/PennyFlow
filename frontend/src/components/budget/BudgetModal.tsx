@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Modal, Button, Input } from "../ui";
 import { formatMonthYear } from "../../utils/formatDate";
+import { getCurrencySymbol } from "../../utils/formatCurrency";
 import type { BudgetCreate } from "../../types";
 
 interface BudgetModalProps {
@@ -69,7 +70,7 @@ export function BudgetModal({
         )}
 
         <Input
-          label="Monthly budget (Rs.)"
+          label={`Monthly budget (${getCurrencySymbol()})`}
           type="number"
           min="0"
           step="0.01"

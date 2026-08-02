@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button, Input, Select } from "../ui";
 import { useMonth } from "../../context/MonthContext";
 import { defaultDateForMonth } from "../../utils/month";
+import { getCurrencySymbol } from "../../utils/formatCurrency";
 import type { ExpenseCreate, Category } from "../../types";
 
 interface ExpenseFormProps {
@@ -78,7 +79,7 @@ export function ExpenseForm({
       />
 
       <Input
-        label="Amount (Rs.)"
+        label={`Amount (${getCurrencySymbol()})`}
         type="number"
         min="0"
         step="0.01"

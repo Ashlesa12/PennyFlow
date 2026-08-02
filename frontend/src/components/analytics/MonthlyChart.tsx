@@ -9,7 +9,7 @@ import {
 } from "recharts";
 import type { TooltipContentProps } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../ui";
-import { formatCurrency } from "../../utils/formatCurrency";
+import { formatCurrency, getCurrencySymbol } from "../../utils/formatCurrency";
 import type { MonthlySummary } from "../../types";
 
 function formatMonthLabel(ym: string): string {
@@ -96,7 +96,7 @@ export function MonthlyChart({ data }: MonthlyChartProps) {
                 axisLine={false}
                 tickLine={false}
                 tick={{ fontSize: 12 }}
-                tickFormatter={(v: number) => `Rs. ${v}`}
+                tickFormatter={(v: number) => `${getCurrencySymbol()} ${v}`}
               />
               <Tooltip content={ChartTooltip} />
               <Bar

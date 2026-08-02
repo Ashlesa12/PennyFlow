@@ -7,6 +7,7 @@ import {
 } from "react";
 import axios from "axios";
 import type { ChangePassword, User, UserPreferences } from "../types";
+import { setCurrency } from "../utils/formatCurrency";
 import {
   changePassword as apiChangePassword,
   deleteAccount as apiDeleteAccount,
@@ -35,7 +36,10 @@ function useSettingsLoad(
 
     fetchMe()
       .then((data) => {
-        if (!cancelled) setUser(data);
+        if (!cancelled) {
+          setUser(data);
+          setCurrency(data.currency ?? "NPR");
+        }
       })
       .catch((err) => {
         if (!cancelled) {
@@ -80,6 +84,7 @@ export function useSettings() {
     try {
       const updated = await apiUpdatePreferences(data);
       setUser(updated);
+      setCurrency(updated.currency ?? "NPR");
       setSuccess("Preferences saved");
       return true;
     } catch (err) {
